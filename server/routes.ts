@@ -253,14 +253,20 @@ export async function registerRoutes(app: Express, httpServer: HTTPServer) {
       const userId = getSessionUserId(req);
 
       if (!userId) {
-        // Dev-friendly: return null to indicate unauthenticated instead of 401
-        return res.status(200).json(null);
+        if (process.env.NODE_ENV !== 'production') {
+          // Dev-friendly: return null to indicate unauthenticated instead of 401
+          return res.status(200).json(null);
+        }
+        return res.status(401).json({ message: 'Not authenticated' });
       }
 
       const user = await storage.getUser(userId);
 
       if (!user) {
-        return res.status(200).json(null);
+        if (process.env.NODE_ENV !== 'production') {
+          return res.status(200).json(null);
+        }
+        return res.status(404).json({ message: 'User not found' });
       }
 
       // Remove password from response

@@ -269,10 +269,16 @@ export function setupAuth(app: Express) {
       });
       
       if (!req.session || !req.session.userId) {
-        // Dev-friendly behavior: return null user instead of 401 so the client
-        // can render unauthenticated state without error loops.
-        console.log("Unauthenticated /api/user request - returning null user");
-        return res.status(200).json(null);
+        // In development we return `null` to reduce noisy client errors while
+        // developing. In production we must return 401 so callers know the
+        // request is unauthenticated.
+        if (process.env.NODE_ENV !== 'production') {
+          console.log("Unauthenticated /api/user request (dev) - returning null user");
+          return res.status(200).json(null);
+        }
+
+        console.log("Authentication failed - no session or userId");
+        return res.status(401).json({ message: "Not authenticated" });
       }
       
       try {

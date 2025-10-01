@@ -32,9 +32,10 @@ let sessionOptions: any = {
   name: 'sessionId', // Explicit session name
   cookie: {
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    secure: false, // Disable secure for development
+    secure: false, // will be overridden to true in production when behind HTTPS
     httpOnly: true,
-    sameSite: 'lax' // Allow cross-origin requests in development
+    // default to lax for development; in production we may need 'none' for cross-site cookies
+    sameSite: 'lax'
   }
 };
 
@@ -48,6 +49,31 @@ if (USE_DB) {
   });
 
   sessionOptions.store = sessionStore;
+}
+
+// Launch-time production hardening
+if (process.env.NODE_ENV === 'production') {
+  // Require a real session secret in production
+  if (!process.env.SESSION_SECRET) {
+    console.error('FATAL: SESSION_SECRET must be set in production');
+    process.exit(1);
+  }
+
+  // Ensure Express trusts the proxy when behind a load balancer so secure cookies work
+  // Allow enabling via TRUST_PROXY env var or default to true in production
+  if (process.env.TRUST_PROXY !== 'false') {
+    // set trust proxy to the first hop
+    app.set('trust proxy', 1);
+  }
+
+  // Enforce secure cookies and appropriate sameSite for cross-site contexts
+  sessionOptions.cookie.secure = true;
+  // If APP_DOMAIN or BASE_URL suggests cross-site (mobile, external origins), use 'none'
+  const preferNone = Boolean(process.env.FORCE_SAMESITE_NONE === 'true' || process.env.BASE_URL || process.env.APP_DOMAIN);
+  sessionOptions.cookie.sameSite = preferNone ? 'none' : 'lax';
+  if (process.env.APP_DOMAIN) {
+    sessionOptions.cookie.domain = process.env.APP_DOMAIN;
+  }
 }
 
 app.use(session(sessionOptions));
