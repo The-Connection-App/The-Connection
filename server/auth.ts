@@ -269,8 +269,10 @@ export function setupAuth(app: Express) {
       });
       
       if (!req.session || !req.session.userId) {
-        console.log("Authentication failed - no session or userId");
-        return res.status(401).json({ message: "Not authenticated" });
+        // Dev-friendly behavior: return null user instead of 401 so the client
+        // can render unauthenticated state without error loops.
+        console.log("Unauthenticated /api/user request - returning null user");
+        return res.status(200).json(null);
       }
       
       try {

@@ -112,4 +112,15 @@ router.get("/status", (req, res) => {
   });
 });
 
+// GET /api/support/legal - Return legal page links for clients (mobile apps can surface these natively)
+router.get("/legal", (req, res) => {
+  res.json({
+    legal: [
+      { title: "Privacy Policy", url: "/privacy.html" },
+      { title: "Terms of Service", url: "/terms.html" },
+      { title: "Community Guidelines", url: "/community-guidelines.html" },
+    ],
+  });
+});
+
 export default router;

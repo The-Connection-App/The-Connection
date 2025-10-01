@@ -6,6 +6,16 @@ import { ThemeProvider } from "./contexts/theme-context";
 import App from "./App";
 import "./index.css";
 
+// Dev helper: force dark mode in development so palette changes are visible immediately
+if (process.env.NODE_ENV !== 'production') {
+  try {
+    // Add the .dark class to document element so CSS .dark tokens apply during dev
+    document.documentElement.classList.add('dark');
+  } catch (e) {
+    // ignore if document isn't ready yet
+  }
+}
+
 // Initialize Google Analytics
 initGA();
 

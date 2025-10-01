@@ -5,23 +5,56 @@ import { neon, Pool } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from "@shared/schema";
 
-// For development MVP, use a simple DATABASE_URL if not set
-const databaseUrl = process.env.DATABASE_URL || "postgresql://user:password@localhost:5432/theconnection";
+// If USE_DB is truthy, require DATABASE_URL and initialize Neon/Drizzle.
+const USE_DB = process.env.USE_DB === 'true';
+const databaseUrl = process.env.DATABASE_URL;
 
-if (!databaseUrl) {
-  throw new Error("DATABASE_URL must be set. Did you forget to provision a database?");
+// Export top-level bindings; we'll assign them below based on USE_DB.
+export let sql: any = null;
+export let pool: any = null;
+export let db: any = null;
+export let isConnected = false;
+
+if (USE_DB) {
+  if (!databaseUrl) {
+    console.error('DATABASE_URL is not set. For production, set DATABASE_URL to your Neon or Postgres connection string.');
+    throw new Error("DATABASE_URL must be set. Did you forget to provision a database?");
+  }
+
+  console.log("Attempting to connect to database...");
+  // Create a Neon connection (serverless HTTP) by default. If you prefer local Postgres in dev,
+  // set DATABASE_URL to a postgres:// connection string and optionally swap to a pg-based driver.
+  sql = neon(databaseUrl);
+
+  // Create a pool for session store
+  pool = new Pool({ connectionString: databaseUrl });
+
+  // Create a Drizzle instance
+  db = drizzle(sql, { schema });
+  isConnected = true;
+} else {
+  // No DB mode - leave sql/pool/db as null and isConnected=false
+  sql = null;
+  pool = null;
+  db = null;
+  isConnected = false;
 }
 
-// Create a Neon connection
-console.log("Attempting to connect to database...");
-export const sql = neon(databaseUrl);
-
-// Create a pool for session store
-export const pool = new Pool({ connectionString: databaseUrl });
-
-// Create a Drizzle instance
-export const db = drizzle(sql, { schema });
-export const isConnected = true;
+/**
+ * Run a lightweight health check against the database. Returns true if a simple query succeeds.
+ */
+export async function checkDbHealth(timeoutMs = 2000): Promise<boolean> {
+  try {
+    if (!isConnected || !sql) return false;
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeoutMs);
+    // run a lightweight select
+    await sql`SELECT 1`.then(() => clearTimeout(id));
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
 
 // Test the database connection
 // sql`SELECT NOW()`

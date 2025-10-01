@@ -67,12 +67,12 @@ export default function MobileNavigation({ currentPath, isVisible = true }: Mobi
         <Link href="/" className="flex-1 touch-manipulation">
           <div 
             className={`flex flex-col items-center py-1 px-1 rounded-lg transition-all duration-200 ${
-              isActive('/') ? 'text-primary bg-primary/15 shadow-sm' : 'text-muted-foreground'
+              isActive('/') ? 'text-primary dark:text-secondary bg-primary/15 dark:bg-secondary/15 shadow-sm' : 'text-muted-foreground'
             } active-scale touch-target mobile-button`}
             onClick={() => handleTabPress('/')}
           >
-            <Home className={`h-4 w-4 ${isActive('/') ? 'fill-primary/20' : ''} transition-all`} />
-            <span className="text-xs mt-0.5 font-medium mobile-text-modern">Home</span>
+            <Home className={`h-4 w-4 ${isActive('/') ? 'fill-primary/20 dark:fill-secondary/20' : ''} transition-all`} />
+            <span className="text-xs mt-0.5 font-medium mobile-nav-label">Home</span>
           </div>
         </Link>
 
@@ -80,12 +80,12 @@ export default function MobileNavigation({ currentPath, isVisible = true }: Mobi
         <Link href="/microblogs" className="flex-1 touch-manipulation">
           <div 
             className={`flex flex-col items-center py-1 px-1 rounded-lg transition-all duration-200 ${
-              isActive('/microblogs') ? 'text-primary bg-primary/15 shadow-sm' : 'text-muted-foreground'
+              isActive('/microblogs') ? 'text-primary dark:text-secondary bg-primary/15 dark:bg-secondary/15 shadow-sm' : 'text-muted-foreground'
             } active-scale touch-target mobile-button`}
             onClick={() => handleTabPress('/microblogs')}
           >
-            <MessageCircle className={`h-4 w-4 ${isActive('/microblogs') ? 'fill-primary/20' : ''} transition-all`} />
-            <span className="text-xs mt-0.5 font-medium mobile-text-modern">Feed</span>
+            <MessageCircle className={`h-4 w-4 ${isActive('/microblogs') ? 'fill-primary/20 dark:fill-secondary/20' : ''} transition-all`} />
+            <span className="text-xs mt-0.5 font-medium mobile-nav-label">Feed</span>
           </div>
         </Link>
 
@@ -102,7 +102,7 @@ export default function MobileNavigation({ currentPath, isVisible = true }: Mobi
             >
               <PenSquare className="h-4 w-4" />
             </div>
-            <span className="text-xs mt-6 font-medium text-muted-foreground mobile-text-modern">Create</span>
+            <span className="text-xs mt-6 font-medium text-muted-foreground mobile-nav-label">Create</span>
           </div>
         </Link>
 
@@ -110,12 +110,12 @@ export default function MobileNavigation({ currentPath, isVisible = true }: Mobi
         <Link href="/communities" className="flex-1 touch-manipulation">
           <div 
             className={`flex flex-col items-center py-1 px-1 rounded-lg transition-all duration-200 ${
-              isActive('/communities') ? 'text-primary bg-primary/15 shadow-sm' : 'text-muted-foreground'
+              isActive('/communities') ? 'text-primary dark:text-secondary bg-primary/15 dark:bg-secondary/15 shadow-sm' : 'text-muted-foreground'
             } active-scale touch-target mobile-button`}
             onClick={() => handleTabPress('/communities')}
           >
-            <Users className={`h-4 w-4 ${isActive('/communities') ? 'fill-primary/20' : ''} transition-all`} />
-            <span className="text-xs mt-0.5 font-medium mobile-text-modern">Communities</span>
+            <Users className={`h-4 w-4 ${isActive('/communities') ? 'fill-primary/20 dark:fill-secondary/20' : ''} transition-all`} />
+            <span className="text-xs mt-0.5 font-medium mobile-nav-label">Communities</span>
           </div>
         </Link>
 
@@ -124,24 +124,24 @@ export default function MobileNavigation({ currentPath, isVisible = true }: Mobi
           <Link href="/dms" className="flex-1 touch-manipulation">
             <div 
               className={`flex flex-col items-center py-1 px-1 rounded-lg transition-all duration-200 ${
-                isActive('/dms') ? 'text-primary bg-primary/15 shadow-sm' : 'text-muted-foreground'
+                isActive('/dms') ? 'text-primary dark:text-secondary bg-primary/15 dark:bg-secondary/15 shadow-sm' : 'text-muted-foreground'
               } active-scale touch-target mobile-button`}
               onClick={() => handleTabPress('/dms')}
             >
-              <MessageSquare className={`h-4 w-4 ${isActive('/dms') ? 'fill-primary/20' : ''} transition-all`} />
-              <span className="text-xs mt-0.5 font-medium mobile-text-modern">Messages</span>
+              <MessageSquare className={`h-4 w-4 ${isActive('/dms') ? 'fill-primary/20 dark:fill-secondary/20' : ''} transition-all`} />
+              <span className="text-xs mt-0.5 font-medium mobile-nav-label">Messages</span>
             </div>
           </Link>
         ) : (
           <Link href="/forums" className="flex-1 touch-manipulation">
             <div 
               className={`flex flex-col items-center py-1 px-1 rounded-lg transition-all duration-200 ${
-                isActive('/forums') ? 'text-primary bg-primary/15 shadow-sm' : 'text-muted-foreground'
+                isActive('/forums') ? 'text-primary dark:text-secondary bg-primary/15 dark:bg-secondary/15 shadow-sm' : 'text-muted-foreground'
               } active-scale touch-target mobile-button`}
               onClick={() => handleTabPress('/forums')}
             >
-              <FileHeart className={`h-4 w-4 ${isActive('/forums') ? 'fill-primary/20' : ''} transition-all`} />
-              <span className="text-xs mt-0.5 font-medium mobile-text-modern">Forums</span>
+              <FileHeart className={`h-4 w-4 ${isActive('/forums') ? 'fill-primary/20 dark:fill-secondary/20' : ''} transition-all`} />
+              <span className="text-xs mt-0.5 font-medium mobile-nav-label">Forums</span>
             </div>
           </Link>
         )}

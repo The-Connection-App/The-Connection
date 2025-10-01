@@ -81,7 +81,10 @@ export const getQueryFn = (options: { on401: UnauthorizedBehavior }): QueryFunct
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      queryFn: getQueryFn({ on401: "throw" }),
+      // In development treat 401 as unauthenticated (return null) to avoid
+      // noisy retries and rendering loops. Callers that need strict behavior
+      // can still pass their own queryFn.
+      queryFn: getQueryFn({ on401: "returnNull" }),
       refetchInterval: false,
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000, // 5 minutes instead of Infinity

@@ -1,94 +1,97 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap');
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 :root {
-  /* The Connection color palette - based on logo colors */
-  /* Soft White (Background) */
-  --background: 220 25% 97%;
-  --foreground: 220 30% 10%;
-  --muted: 220 15% 92%;
-  --muted-foreground: 220 10% 40%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 220 30% 10%;
-  --card: 0 0% 100%;
-  --card-foreground: 220 30% 10%;
-  --border: 220 20% 85%;
-  --input: 220 20% 85%;
-  
-  /* Deep Navy Blue (Primary Identity Color) */
-  --primary: 225 60% 11%;
-  --primary-foreground: 0 0% 100%;
-  
-  /* Rich Royal Blue (Secondary Color) */
-  --secondary: 230 63% 37%;
-  --secondary-foreground: 0 0% 100%;
-  
-  /* Complementary Blue Accent */
-  --accent: 215 75% 55%;
-  --accent-foreground: 0 0% 100%;
-  
-  /* Default red for destructive actions */
-  --destructive: 0 75% 45%;
-  --destructive-foreground: 0 0% 100%;
-  --ring: 225 60% 11%;
-  --radius: 0.5rem;
-}
+    /* Light Mode - Optimized for readability */
+    --background: 220 25% 97%;              /* #F5F7F9 */
+    --foreground: 220 30% 10%;              /* #121721 */
+    
+    --muted: 220 15% 92%;                   /* #E8EAEE */
+    --muted-foreground: 220 10% 40%;        /* #5C6370 */
+    
+    --popover: 0 0% 100%;                   /* #FFFFFF */
+    --popover-foreground: 220 30% 10%;      /* #121721 */
+    
+    --card: 0 0% 100%;                      /* #FFFFFF */
+    --card-foreground: 220 30% 10%;         /* #121721 */
+    
+    --border: 220 20% 85%;                  /* #D1D6E0 */
+    --input: 220 20% 85%;                   /* #D1D6E0 */
+    
+    --primary: 225 60% 11%;                 /* #0B142D */
+    --primary-foreground: 0 0% 100%;        /* #FFFFFF */
+    
+    --secondary: 230 63% 37%;               /* #23379A */
+    --secondary-foreground: 0 0% 100%;      /* #FFFFFF */
+    
+    --accent: 215 75% 55%;                  /* #367EE2 */
+    --accent-foreground: 0 0% 100%;         /* #FFFFFF */
+    
+    --destructive: 0 75% 45%;               /* #C91D1D */
+    --destructive-foreground: 0 0% 100%;    /* #FFFFFF */
+    
+    --ring: 225 60% 11%;                    /* #0B142D */
+    --radius: 0.5rem;
+  }
 
-.dark {
-  /* Deep Navy background (Dark Mode/Contrast) */
-  --background: 225 38% 7%;
-  --foreground: 225 10% 98%;
-  /* slightly lighter muted/background tones so cards don't feel crushed */
-  --muted: 225 28% 16%;
-  --muted-foreground: 225 10% 85%;
-  --popover: 225 38% 9%;
-  --popover-foreground: 225 10% 98%;
-  /* lighten cards a touch so boxed content reads better */
-  --card: 225 30% 16%;
-  --card-foreground: 225 10% 98%;
-  /* softer border so it reads against the lighter card */
-  --border: 225 26% 26%;
-  --input: 225 26% 26%;
-  
-  /* Brighter Navy for dark mode */
-  --primary: 225 70% 25%;
-  --primary-foreground: 0 0% 100%;
-  
-  /* Brighter Royal Blue for dark mode */
-  --secondary: 230 75% 50%;
-  --secondary-foreground: 0 0% 100%;
-  
-  /* Brighter Blue Accent for dark mode */
-  --accent: 215 85% 65%;
-  --accent-foreground: 0 0% 100%;
-  
-  --destructive: 0 80% 55%;
-  --destructive-foreground: 0 0% 100%;
-  --ring: 225 70% 25%;
-  --radius: 0.5rem;
-}
+  .dark {
+    /* Dark Mode - Fixed for AAA contrast & legibility */
+    --background: 225 38% 7%;               /* #0B0E19 */
+    --foreground: 225 10% 98%;              /* #F9FAFA */
+    
+    --muted: 225 28% 20%;                   /* #252D42 */
+    --muted-foreground: 225 10% 85%;        /* #D5D7DD */
+    
+    --popover: 225 38% 9%;                  /* #0E1320 */
+    --popover-foreground: 225 10% 98%;      /* #F9FAFA */
+    
+    --card: 225 30% 18%;                    /* #232B40 */
+    --card-foreground: 225 10% 98%;         /* #F9FAFA */
+    
+    --border: 225 26% 30%;                  /* #3D4865 */
+    --input: 225 26% 30%;                   /* #3D4865 */
+    
+    --primary: 215 75% 65%;                 /* #5A99F2 - Brightened for contrast */
+    --primary-foreground: 220 30% 10%;      /* #121721 */
+    
+    --secondary: 220 70% 60%;               /* #5287E8 - Better visibility */
+    --secondary-foreground: 0 0% 100%;      /* #FFFFFF */
+    
+    --accent: 215 85% 70%;                  /* #78AAFF - Vibrant & readable */
+    --accent-foreground: 220 30% 10%;       /* #121721 */
+    
+    --destructive: 0 80% 60%;               /* #F04747 - Brighter red */
+    --destructive-foreground: 0 0% 100%;    /* #FFFFFF */
+    
+    --ring: 215 75% 65%;                    /* #5A99F2 */
+  }
 
 @layer base {
   body {
-    @apply antialiased bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
     font-family: 'Inter', sans-serif;
-    letter-spacing: -0.01em;
-  }
-
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Merriweather', serif;
-    @apply font-medium tracking-tight;
+    font-weight: 500;
+    letter-spacing: -0.02em;
   }
-  
   .site-title {
     font-family: 'Playfair Display', serif;
-    @apply font-medium tracking-normal;
+    font-weight: 500;
+    letter-spacing: 0;
     color: #222D99; /* Fallback color */
     background: linear-gradient(135deg, #222D99, #4A90E2, #6B9FED);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -96,25 +99,68 @@
 
   /* More professional card styling */
   .card-hover {
-    @apply transition-all duration-300 hover:shadow-md hover:shadow-primary/5 hover:border-primary/20;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+  }
+
+  .card-hover:hover {
+    /* Approximate Tailwind's shadow-md and subtle primary-tinted shadow/border */
+  .btn-primary {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    box-shadow: 0 1px 2px rgba(11, 19, 43, 0.06);
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .btn-primary:hover {
+    background-color: hsl(var(--primary) / 0.9);
   }
 
   /* Sophisticated button styles */
   .btn-primary {
-    @apply bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    box-shadow: 0 1px 2px rgba(11, 19, 43, 0.06); /* shadow-sm approximation */
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
-  
-  .btn-secondary {
-    @apply bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/90 transition-colors;
+  .btn-subtle {
+    background: hsl(var(--muted));
+    color: hsl(var(--muted-foreground));
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .btn-subtle:hover {
+    background-color: hsl(var(--muted) / 0.8);
+  }
+    color: hsl(var(--secondary-foreground));
+    box-shadow: 0 1px 2px rgba(11, 19, 43, 0.06);
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .btn-secondary:hover {
+    background-color: hsl(var(--secondary) / 0.9);
   }
   
   .btn-subtle {
-    @apply bg-muted text-muted-foreground hover:bg-muted/80 transition-colors;
+    background: hsl(var(--muted));
+    color: hsl(var(--muted-foreground));
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .btn-subtle:hover {
+    background-color: hsl(var(--muted) / 0.8);
   }
   
   .btn-gradient {
     background: linear-gradient(135deg, #0B132B, #222D99, #4A90E2);
-    @apply text-white shadow-sm hover:shadow-md hover:shadow-secondary/20 transition-all;
+    color: hsl(var(--primary-foreground)); /* equivalent to text-white */
+    box-shadow: 0 1px 2px rgba(11, 19, 43, 0.06); /* approximate shadow-sm */
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .btn-gradient:hover {
+    box-shadow: 0 6px 20px rgba(11, 19, 43, 0.08), 0 2px 8px rgba(34, 45, 153, 0.08); /* approximate shadow-md + subtle secondary tint */
+    transform: translateY(-1px);
   }
   
   .text-gradient {
@@ -181,10 +227,19 @@
   .hero-feature-hover:hover {
     transform: translateX(8px);
   }
+  /* Text styles */
+  .text-overline {
+    text-transform: uppercase;
+    font-size: 0.75rem; /* equivalent to text-xs */
+    letter-spacing: 0.08em; /* tracking-wider approximation */
+    font-weight: 500; /* font-medium */
+    color: hsl(var(--muted-foreground));
+    display: inline-block;
+  }
 
-  /* Pulse animation for accent elements */
-  .pulse-accent {
-    animation: pulseAccent 4s ease-in-out infinite;
+  .text-caption {
+    font-size: 0.875rem; /* equivalent to text-sm */
+    color: hsl(var(--muted-foreground));
   }
 
   @keyframes pulseAccent {
@@ -196,15 +251,6 @@
       opacity: 0.2;
       transform: scale(1.1);
     }
-  }
-
-  /* Text styles */
-  .text-overline {
-    @apply uppercase text-xs tracking-wider font-medium text-muted-foreground;
-  }
-  
-  .text-caption {
-    @apply text-sm text-muted-foreground;
   }
   
   /* Community page mobile improvements */
@@ -238,11 +284,23 @@
 
   /* Section styling */
   .section-title {
-    @apply text-2xl md:text-3xl font-bold mb-2;
+    /* Equivalent to: text-2xl, font-bold, mb-2 */
+    font-size: 1.5rem; /* text-2xl */
+    font-weight: 700;  /* font-bold */
+    margin-bottom: 0.5rem; /* mb-2 */
+  }
+
+  @media (min-width: 768px) {
+    .section-title {
+      /* md:text-3xl */
+      font-size: 1.875rem; /* text-3xl */
+    }
   }
   
   .section-description {
-    @apply text-muted-foreground mb-6 max-w-2xl;
+    color: hsl(var(--muted-foreground));
+    margin-bottom: 1.5rem;
+    max-width: 42rem;
   }
 
   /* Custom animations */
@@ -354,11 +412,24 @@
     transform: translateX(8px);
   }
 
-  /* Pulse animation for accent elements */
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
   .pulse-accent {
-    animation: pulseAccent 4s ease-in-out infinite;
+    /* subtle pulsing accent for decorative elements */
+    animation: pulseAccent 2.5s ease-in-out infinite;
+    will-change: transform, opacity;
   }
 
+  ::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--primary) / 0.3);
+    border-radius: 9999px;
+    transition: background-color 0.2s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--primary) / 0.5);
+  }
   @keyframes pulseAccent {
     0%, 100% {
       opacity: 0.1;
@@ -376,13 +447,65 @@
   }
   
   ::-webkit-scrollbar-track {
-    @apply bg-muted;
+    background-color: hsl(var(--muted));
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-primary/30 rounded-full hover:bg-primary/50 transition-colors;
+    background-color: hsl(var(--primary) / 0.3);
+    border-radius: 9999px;
+    transition: background-color 0.2s ease;
+  }
+
+  /* Hide native scrollbars while preserving scrolling UX */
+  /* WebKit browsers (Chrome, Safari, Edge) */
+  ::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: none; /* hide scrollbar but keep scrolling */
+  }
+
+  /* Modern browsers supporting the overflow CSS property */
+  html, body, #root {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-gutter: stable both-edges;
   }
 }
+
+/*
+  Final fallback: force-hide scrollbars globally.
+  This block is intentionally placed at the end of the stylesheet and uses !important
+  to override other rules. It preserves scrolling but removes the visible native scrollbar.
+  Warning: hiding scrollbars can reduce discoverability for some users. Consider scoping
+  or making this opt-in if you need accessibility support.
+*/
+html, body, #root, .app, .App {
+  -ms-overflow-style: none !important; /* IE and Edge */
+  scrollbar-width: none !important; /* Firefox */
+}
+
+/* WebKit browsers - hide any native scrollbar glyph */
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Utility: opt-in container-level hiding */
+.hide-scrollbars, .hide-scrollbars * {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+.hide-scrollbars *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 
 /* Dark mode enhancement: slightly stronger shadows and softer card backgrounds */
 /* Scoped helper classes for improved card contrast & depth are applied in the @layer base block below */
@@ -476,6 +599,15 @@
     font-size: 16px;
     line-height: 1.5;
     letter-spacing: -0.01em;
+  }
+
+  /* Smaller mobile nav labels for better fit */
+  .mobile-nav-label {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 12px; /* smaller than mobile-text-modern so long labels fit */
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    display: block;
   }
   
   /* Beautiful input fields */
@@ -612,6 +744,12 @@
     background: linear-gradient(135deg, #0B132B, #222D99);
     color: white;
     border-radius: 0.5rem;
+  }
+
+  /* Make active label/icon color use the lighter blue in dark mode for better contrast */
+  .dark .mobile-nav-modern .mobile-nav-label,
+  .dark .mobile-nav-modern .lucide {
+    color: hsl(var(--secondary));
   }
   
   /* Sticky elements on mobile */

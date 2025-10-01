@@ -24,11 +24,15 @@ export default function SidebarNavigation({ currentPath }: SidebarNavigationProp
   const { user } = useAuth() as AuthContextType;
   const isAdmin = user && user.isAdmin;
 
+  // Keep the Home button visually identical for all users.
+  // The destination changes depending on auth state: signed-in users go to /profile, others go to the public home (/).
+  const homePath = user ? "/profile" : "/";
+
   const navItems = [
     {
       title: "Main",
       items: [
-        { icon: <Home className="h-5 w-5" />, label: "Home", path: "/" },
+  { icon: <Home className="h-5 w-5" />, label: "Home", path: homePath },
         { icon: <MessageCircle className="h-5 w-5" />, label: "Feed", path: "/microblogs" },
         // { icon: <BookOpen className="h-5 w-5" />, label: "Bible Study", path: "/bible-study" }, // Hidden for MVP
         { icon: <Users className="h-5 w-5" />, label: "Communities", path: "/communities" },

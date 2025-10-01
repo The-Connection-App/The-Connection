@@ -86,6 +86,7 @@ import communitiesRoutes from './routes/communities';
 import eventsRoutes from './routes/events';
 import apologeticsRoutes from './routes/apologetics';
 import moderationRoutes from './routes/moderation';
+import forumsRoutes from './routes/forums';
 
 declare module 'express-session' {
   interface SessionData {
@@ -97,7 +98,7 @@ declare module 'express-session' {
   }
 }
 
-export function registerRoutes(app: Express, httpServer: HTTPServer) {
+export async function registerRoutes(app: Express, httpServer: HTTPServer) {
   // Set up authentication
   setupAuth(app);
 
@@ -200,9 +201,10 @@ export function registerRoutes(app: Express, httpServer: HTTPServer) {
   if (FEATURES.AUTH) {
     app.use('/api', authRoutes);
     app.use('/api', accountRoutes);
-    // safety routes (reports, blocks) kept for backwards compatibility
-    const safetyRoutes = require('./routes/safety').default;
-    app.use('/api', safetyRoutes);
+  // safety routes (reports, blocks) kept for backwards compatibility
+  const safetyMod = await import('./routes/safety');
+  const safetyRoutes = (safetyMod && safetyMod.default) || safetyMod;
+  app.use('/api', safetyRoutes as any);
     // compatibility moderation router (client expects /api/moderation/*)
     app.use('/api', moderationRoutes);
   }
@@ -227,6 +229,8 @@ export function registerRoutes(app: Express, httpServer: HTTPServer) {
   if (FEATURES.COMMUNITIES) {
     app.use('/api', communitiesRoutes);
   }
+  // Mount forums routes so the client can fetch forum lists
+  app.use('/api', forumsRoutes);
   if (FEATURES.EVENTS) {
     app.use('/api', eventsRoutes);
   }
@@ -247,21 +251,18 @@ export function registerRoutes(app: Express, httpServer: HTTPServer) {
   app.get('/api/user', async (req, res) => {
     try {
       const userId = getSessionUserId(req);
-      
+
       if (!userId) {
-        return res.status(401).json({ message: 'Not authenticated' });
-      }
-      
-      if (userId === undefined) {
-        return res.status(401).json({ message: 'Not authenticated' });
+        // Dev-friendly: return null to indicate unauthenticated instead of 401
+        return res.status(200).json(null);
       }
 
       const user = await storage.getUser(userId);
-      
+
       if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(200).json(null);
       }
-      
+
       // Remove password from response
       const { password, ...userData } = user;
       res.json(userData);
@@ -269,6 +270,19 @@ export function registerRoutes(app: Express, httpServer: HTTPServer) {
       console.error('Error fetching current user:', error);
       res.status(500).json({ message: 'Error fetching user' });
     }
+  });
+
+  // Friendly redirects for legal pages (short paths) so mobile and web can use stable links
+  app.get('/privacy', (_req, res) => {
+    return res.redirect(302, '/privacy.html');
+  });
+
+  app.get('/terms', (_req, res) => {
+    return res.redirect(302, '/terms.html');
+  });
+
+  app.get('/community-guidelines', (_req, res) => {
+    return res.redirect(302, '/community-guidelines.html');
   });
   
   if (FEATURES.AUTH) {

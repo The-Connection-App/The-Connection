@@ -93,6 +93,23 @@ app.use(cors({
   credentials: true
 }));
 
+  // Development auto-login middleware (optional)
+  // If DEV_AUTHS=true and DEV_USER_ID is set, automatically set req.session.userId
+  // This is intentionally guarded to only run in non-production to avoid security risks.
+  if (process.env.NODE_ENV !== 'production' && process.env.DEV_AUTHS === 'true') {
+    app.use(async (req, _res, next) => {
+      try {
+        const devUserId = Number(process.env.DEV_USER_ID || 0);
+        if (devUserId && !req.session?.userId) {
+          req.session.userId = devUserId;
+        }
+      } catch (e) {
+        // ignore
+      }
+      next();
+    });
+  }
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;

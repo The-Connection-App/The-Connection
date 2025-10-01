@@ -5,6 +5,23 @@ import { trackPageView, trackEvent } from "./lib/analytics";
 import { Toaster } from "./components/ui/toaster";
 import ResponsiveLayout from "./components/layouts/responsive-layout";
 import { useAuth } from "./hooks/use-auth";
+import ThemeDebugOverlay from "./components/ThemeDebugOverlay";
+
+// Small component that decides what to show at the root path
+function AuthHome() {
+  const { user } = useAuth();
+  const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    if (user) {
+      // If logged in, redirect to their profile page
+      setLocation('/profile');
+    }
+  }, [user, setLocation]);
+
+  // If no user, render the public HomePage component
+  return <HomePage />;
+}
 
 // Route-level code-splitting using React.lazy
 const HomePage = lazy(() => import("./pages/home-page"));
@@ -75,7 +92,7 @@ function App() {
           <div className="flex items-center justify-center min-h-[50vh]"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div></div>
         }>
           <Switch>
-          <Route path="/" component={() => <HomePage />} />
+          <Route path="/" component={() => <AuthHome />} />
           <Route path="/auth" component={AuthPage} />
           
           {/* Main Content Pages */}
@@ -122,6 +139,7 @@ function App() {
           </Switch>
         </Suspense>
       </ResponsiveLayout>
+  <ThemeDebugOverlay />
       <Toaster />
     </Router>
   );

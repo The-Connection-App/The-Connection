@@ -261,7 +261,36 @@ export default function SupportPage() {
           </CardContent>
         </Card>
 
-        {/* FAQ Section */}
+          {/* Legal & Policies */}
+          <Card className="mt-8">
+            <CardHeader>
+              <CardTitle>Legal & Policies</CardTitle>
+              <CardDescription>
+                Important legal pages you can review about using The Connection.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <p>
+                  <a href="/privacy.html" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    Privacy Policy
+                  </a>
+                </p>
+                <p>
+                  <a href="/terms.html" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    Terms of Service
+                  </a>
+                </p>
+                <p>
+                  <a href="/community-guidelines.html" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    Community Guidelines
+                  </a>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* FAQ Section */}
         <Card className="mt-8">
           <CardHeader>
             <CardTitle>Frequently Asked Questions</CardTitle>
