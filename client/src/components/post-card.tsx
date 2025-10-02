@@ -269,7 +269,7 @@ export default function PostCard({ post, featured = false }: PostCardProps) {
             onClick={() => setIsShareOpen(!isShareOpen)}
           >
             <Share2 className="mr-1 h-4 w-4" />
-            <span>Share</span>
+            <span>Spark</span>
           </Button>
           
           <Button 

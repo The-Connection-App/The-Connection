@@ -127,7 +127,7 @@ export function BlockUserModal({
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                <label className="text-sm font-medium text-muted-foreground mb-2 block">
                   Reason for blocking (optional)
                 </label>
                 <Select value={reason} onValueChange={setReason}>

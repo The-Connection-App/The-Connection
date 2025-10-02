@@ -162,7 +162,7 @@ export default function Dashboard() {
                 <CardTitle className="mobile-text-modern text-lg">{feature.title}</CardTitle>
               </CardHeader>
               <CardContent className="p-4 pt-0">
-                <CardDescription className="text-gray-700 mobile-text-modern text-sm">{feature.description}</CardDescription>
+                <CardDescription className="text-muted-foreground mobile-text-modern text-sm">{feature.description}</CardDescription>
               </CardContent>
               <CardFooter className="p-4 pt-0">
                 <Button variant="outline" className="w-full mobile-modern-card border-primary/30 text-primary hover:bg-primary/5" asChild>
@@ -192,7 +192,7 @@ export default function Dashboard() {
                 <CardTitle className="mobile-text-modern text-lg">{feature.title}</CardTitle>
               </CardHeader>
               <CardContent className="p-4 pt-0">
-                <CardDescription className="text-gray-700 mobile-text-modern text-sm">{feature.description}</CardDescription>
+                <CardDescription className="text-muted-foreground mobile-text-modern text-sm">{feature.description}</CardDescription>
               </CardContent>
               <CardFooter className="p-4 pt-0">
                 <Button variant="outline" className="w-full mobile-modern-card border-secondary/30 text-secondary hover:bg-secondary/5" asChild>

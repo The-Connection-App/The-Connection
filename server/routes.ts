@@ -87,6 +87,8 @@ import eventsRoutes from './routes/events';
 import apologeticsRoutes from './routes/apologetics';
 import moderationRoutes from './routes/moderation';
 import forumsRoutes from './routes/forums';
+import connectionsRoutes from './routes/api/connections';
+import pushTokensRoutes from './routes/pushTokens';
 
 declare module 'express-session' {
   interface SessionData {
@@ -201,6 +203,8 @@ export async function registerRoutes(app: Express, httpServer: HTTPServer) {
   if (FEATURES.AUTH) {
     app.use('/api', authRoutes);
     app.use('/api', accountRoutes);
+    // Connections (friends) API
+    app.use('/api', connectionsRoutes);
   // safety routes (reports, blocks) kept for backwards compatibility
   const safetyMod = await import('./routes/safety');
   const safetyRoutes = (safetyMod && safetyMod.default) || safetyMod;
@@ -215,6 +219,10 @@ export async function registerRoutes(app: Express, httpServer: HTTPServer) {
 
   if (FEATURES.NOTIFICATIONS || FEATURES.COMMUNITIES || FEATURES.POSTS || FEATURES.FEED) {
     app.use('/api/support', supportRoutes);
+    // Push token registration endpoints (used by mobile clients)
+    if (FEATURES.NOTIFICATIONS) {
+      app.use('/api/push-tokens', pushTokensRoutes);
+    }
   }
 
   // Minimal MVP routes are always available under /api/mvp

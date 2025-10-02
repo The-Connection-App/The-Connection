@@ -121,7 +121,7 @@ export function PersonalizedFeedCard({ microblog, community }: PersonalizedFeedC
                 </div>
               </div>
               
-              <p className="text-xs text-gray-600 mt-1 line-clamp-2">{community.description}</p>
+              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{community.description}</p>
               
               <div className="flex items-center justify-between mt-2">
                 <div className="flex items-center gap-4 text-xs text-gray-500">

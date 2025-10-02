@@ -179,21 +179,22 @@ function Menubar() {
       
       {/* Mobile menu dropdown */}
       {isMobile && showMobileMenu && (
-        <div className="md:hidden mt-2 border-t pt-2">
+            <div className="md:hidden mt-2 border-t pt-2">
           <div className="flex flex-wrap gap-1">
             {menuItems.map((item) => (
               <Button
                 key={item.label}
                 variant="ghost"
                 size="sm"
-                className="flex items-center gap-1.5 flex-1 min-w-[110px]"
+                aria-label={item.label}
+                title={item.label}
+                className="flex items-center justify-center flex-1 min-w-[56px]"
                 onClick={() => {
                   navigate(item.path);
                   setShowMobileMenu(false);
                 }}
               >
                 {item.icon}
-                <span className="text-xs">{item.label}</span>
               </Button>
             ))}
           </div>
@@ -301,8 +302,9 @@ function CommunitiesSection() {
         {communities.slice(0, 3).map(community => (
           <Card key={community.id} className="hover:shadow-sm transition-shadow">
             <CardHeader className="py-3 px-3 md:px-4">
-              <CardTitle className="text-base md:text-lg">{community.name}</CardTitle>
-              <CardDescription className="line-clamp-2 text-xs md:text-sm">{community.description}</CardDescription>
+              {/* Ensure titles/descriptions explicitly use the card foreground so dark mode shows readable text */}
+              <CardTitle className="text-base md:text-lg text-card-foreground">{community.name}</CardTitle>
+              <CardDescription className="line-clamp-2 text-xs md:text-sm text-card-foreground">{community.description}</CardDescription>
             </CardHeader>
             <CardFooter className="py-2 px-3 md:px-4 flex justify-between border-t">
               <div className="text-xs md:text-sm text-muted-foreground flex items-center">
@@ -490,7 +492,7 @@ export default function IntegratedDashboard() {
                     <AvatarFallback>{user?.displayName?.charAt(0) || user?.username?.charAt(0) || 'U'}</AvatarFallback>
                   </Avatar>
                   <Input 
-                    placeholder="Share what's on your mind..." 
+                    placeholder="Spark up some conversation..." 
                     className="flex-1 text-sm h-9"
                     onClick={() => navigate('/submit')}
                     readOnly

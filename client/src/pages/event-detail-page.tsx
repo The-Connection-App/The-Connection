@@ -560,64 +560,64 @@ export default function EventDetailPage() {
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Share This Event</DialogTitle>
+            <DialogTitle>Light a Spark on this Event</DialogTitle>
             <DialogDescription>
-              Share this event with your friends and community
+              Light a spark — share this event with your friends and community
             </DialogDescription>
           </DialogHeader>
-          
-          <div className="flex flex-col space-y-4 py-4">
-            <div className="flex justify-center space-x-4">
-              <FacebookShareButton 
-                url={shareUrl}>
-                <FacebookIcon size={48} round />
-              </FacebookShareButton>
-              
-              <TwitterShareButton 
-                url={shareUrl} 
-                title={`Join me at ${event?.title || 'this event'}!`}
-                hashtags={['TheConnection', 'ChristianEvents']}>
-                <TwitterIcon size={48} round />
-              </TwitterShareButton>
-              
-              <WhatsappShareButton 
-                url={shareUrl} 
-                title={`Join me at ${event?.title || 'this event'}!`}>
-                <WhatsappIcon size={48} round />
-              </WhatsappShareButton>
-              
-              <LinkedinShareButton
-                url={shareUrl}
-                title={`${event?.title || 'Christian Event'}`}
-                summary={`Join me at this event on The Connection platform: ${event?.title || 'Christian Event'}`}>
-                <LinkedinIcon size={48} round />
-              </LinkedinShareButton>
-              
-              <EmailShareButton 
-                url={shareUrl} 
-                subject={`Invitation: ${event?.title || 'Event'}`} 
-                body={`I'd like to invite you to ${event?.title || 'this event'}. Check it out here:`}>
-                <EmailIcon size={48} round />
-              </EmailShareButton>
-            </div>
-            
-            <div className="flex items-center justify-between space-x-2 bg-muted p-2 rounded-md">
-              <div className="truncate text-sm text-muted-foreground">{shareUrl}</div>
-              <Button variant="secondary" size="sm" onClick={handleCopyLink}>
-                Copy Link
-              </Button>
-            </div>
-            
-            <div className="text-center text-sm text-muted-foreground mt-2">
-              Event details will be shared when using these links
-            </div>
+
+          <div className="flex justify-center space-x-4">
+            <FacebookShareButton url={shareUrl}>
+              <FacebookIcon size={48} round />
+            </FacebookShareButton>
+
+            <TwitterShareButton
+              url={shareUrl}
+              title={`Join me at ${event?.title || 'this event'}!`}
+              hashtags={['TheConnection', 'ChristianEvents']}
+            >
+              <TwitterIcon size={48} round />
+            </TwitterShareButton>
+
+            <WhatsappShareButton url={shareUrl} title={`Join me at ${event?.title || 'this event'}!`}>
+              <WhatsappIcon size={48} round />
+            </WhatsappShareButton>
+
+            <LinkedinShareButton
+              url={shareUrl}
+              title={`${event?.title || 'Christian Event'}`}
+              summary={`Join me at this event on The Connection platform: ${event?.title || 'Christian Event'}`}
+            >
+              <LinkedinIcon size={48} round />
+            </LinkedinShareButton>
+
+            <EmailShareButton
+              url={shareUrl}
+              subject={`Invitation: ${event?.title || 'Event'}`}
+              body={`I'd like to invite you to ${event?.title || 'this event'}. Check it out here:`}
+            >
+              <EmailIcon size={48} round />
+            </EmailShareButton>
           </div>
-          
-          <DialogClose asChild>
-            <Button variant="outline" className="mt-2">
-              Close
+
+          <div className="flex items-center justify-between space-x-2 bg-muted p-2 rounded-md mt-4">
+            <div className="truncate text-sm text-muted-foreground">{shareUrl}</div>
+            <Button variant="secondary" size="sm" onClick={handleCopyLink}>
+              Copy Link
             </Button>
-          </DialogClose>
+          </div>
+
+          <div className="text-center text-sm text-muted-foreground mt-2">
+            Event details will be shared when using these links
+          </div>
+
+          <div className="flex justify-center">
+            <DialogClose asChild>
+              <Button variant="outline" className="mt-2">
+                Close
+              </Button>
+            </DialogClose>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

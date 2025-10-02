@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { insertPostSchema, insertCommentSchema } from "./shared/schema.js";
+import { insertPostSchema, insertCommentSchema } from "../shared/schema.js";
 import { isAuthenticated } from "../auth.js";
 import { storage as storageReal } from "../storage.js";
 const storage = storageReal;

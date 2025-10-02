@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { isAuthenticated } from "../auth.js";
 import { db, sql } from "../db.js";
-import { users, posts, communities, events } from "./shared/schema.js";
+import { users, posts, communities, events } from "../shared/schema.js";
 import { eq } from "drizzle-orm";
 const router = Router();
 router.delete("/me", isAuthenticated, async (req, res) => {

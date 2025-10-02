@@ -106,7 +106,7 @@ export default function CommunitiesList() {
     return (
       <Card>
         <CardHeader className="px-4 py-3 bg-neutral-50 border-b border-neutral-200">
-          <CardTitle className="font-semibold text-neutral-800">Popular Communities</CardTitle>
+          <CardTitle className="font-semibold text-card-foreground">Popular Communities</CardTitle>
         </CardHeader>
         <CardContent className="p-2">
           {[1, 2, 3, 4].map((i) => (
@@ -128,7 +128,7 @@ export default function CommunitiesList() {
   return (
     <Card>
       <CardHeader className="px-4 py-3 bg-neutral-50 border-b border-neutral-200">
-        <CardTitle className="font-semibold text-neutral-800">Popular Communities</CardTitle>
+        <CardTitle className="font-semibold text-card-foreground">Popular Communities</CardTitle>
       </CardHeader>
       <CardContent className="p-2">
         <ul className="space-y-1">

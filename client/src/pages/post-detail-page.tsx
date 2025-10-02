@@ -510,7 +510,7 @@ export default function PostDetailPage() {
               </div>
             ) : (
               <div className="py-8 text-center">
-                <p className="text-neutral-600">No comments yet. Be the first to share your thoughts!</p>
+                <p className="text-neutral-600">No comments yet. Be the first to spark a conversation!</p>
               </div>
             )}
           </CardContent>
@@ -522,7 +522,7 @@ export default function PostDetailPage() {
         {post?.community && (
           <Card>
             <CardHeader className="bg-neutral-50 border-b border-neutral-200">
-              <CardTitle className="text-neutral-800">About r/{post.community.slug}</CardTitle>
+              <CardTitle className="text-card-foreground">About r/{post.community.slug}</CardTitle>
             </CardHeader>
             <CardContent className="p-4">
               <p className="text-neutral-600 text-sm mb-4">
@@ -549,7 +549,7 @@ export default function PostDetailPage() {
         
         <Card>
           <CardHeader className="bg-neutral-50 border-b border-neutral-200">
-            <CardTitle className="text-neutral-800">Community Rules</CardTitle>
+            <CardTitle className="text-card-foreground">Community Rules</CardTitle>
           </CardHeader>
           <CardContent className="p-4">
             <ul className="space-y-3 text-sm">

@@ -335,7 +335,7 @@ export default function SubmitPostPage() {
       <aside className="hidden lg:block w-80 space-y-6 sticky top-24 self-start">
         <Card>
           <CardHeader className="bg-neutral-50 border-b border-neutral-200">
-            <CardTitle className="text-neutral-800">Posting Guidelines</CardTitle>
+            <CardTitle className="text-card-foreground">Posting Guidelines</CardTitle>
           </CardHeader>
           <CardContent className="p-4">
             <ul className="space-y-3 text-sm">

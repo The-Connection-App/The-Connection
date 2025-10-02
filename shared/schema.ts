@@ -28,6 +28,13 @@ export const users = pgTable("users", {
   latitude: text("latitude"),
   longitude: text("longitude"),
   onboardingCompleted: boolean("onboarding_completed").default(false),
+  // Notification preferences (defaults to true)
+  notifyDMs: boolean("notify_dms").default(true),
+  notifyCommunities: boolean("notify_communities").default(true),
+  notifyForums: boolean("notify_forums").default(true),
+  notifyFeed: boolean("notify_feed").default(true),
+  // DM privacy: who can DM this user
+  dmPrivacy: text("dm_privacy").default("everyone"), // "everyone", "connections", "nobody"
   isVerifiedApologeticsAnswerer: boolean("is_verified_apologetics_answerer").default(false),
   isAdmin: boolean("is_admin").default(false),
   createdAt: timestamp("created_at").defaultNow(),
@@ -41,6 +48,42 @@ export const insertUserSchema = createInsertSchema(users).omit({
   createdAt: true,
   updatedAt: true,
 } as any);
+
+// User Connections (Friends/Followers)
+export const connections = pgTable("connections", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  connectedUserId: integer("connected_user_id").references(() => users.id).notNull(),
+  status: text("status").notNull().default("pending"), // "pending", "accepted", "blocked"
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertConnectionSchema = createInsertSchema(connections).omit({
+  id: true,
+  createdAt: true,
+} as any);
+
+export type InsertConnection = z.infer<typeof insertConnectionSchema>;
+export type Connection = typeof connections.$inferSelect;
+
+// Push notification tokens
+export const pushTokens = pgTable("push_tokens", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  token: text("token").notNull().unique(),
+  platform: text("platform").notNull(), // "ios", "android", "web"
+  createdAt: timestamp("created_at").defaultNow(),
+  lastUsed: timestamp("last_used").defaultNow(),
+} as any);
+
+export const insertPushTokenSchema = createInsertSchema(pushTokens).omit({
+  id: true,
+  createdAt: true,
+} as any);
+
+export type InsertPushToken = z.infer<typeof insertPushTokenSchema>;
+export type PushToken = typeof pushTokens.$inferSelect;
+
 
 // Organizations table schema (Churches and ministries)
 export const organizations = pgTable("organizations", {

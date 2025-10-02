@@ -13,8 +13,21 @@ function walk(dir) {
 }
 
 function fixImports(code, filePath) {
-  // Replace path alias @shared/... -> ./shared/...
-  code = code.replace(/@shared\/(\S+?)(['";])/g, (m, p1, p2) => `./shared/${p1}.js${p2}`);
+  // Replace path alias @shared/... -> relative path to dist-server/shared/<name>.js
+  // Compute the correct relative path from the file being patched so that
+  // files inside dist-server/routes will import ../shared/schema.js (not ./shared/schema.js)
+  code = code.replace(/@shared\/(\S+?)(['";])/g, (m, p1, p2) => {
+    try {
+      // Resolve the target inside dist-server/shared, regardless of the file's directory.
+      const distRoot = path.resolve(__dirname, '..', 'dist-server');
+      const targetAbs = path.join(distRoot, 'shared', `${p1}.js`);
+      let rel = path.relative(path.dirname(filePath), targetAbs).replace(/\\/g, '/');
+      if (!rel.startsWith('.')) rel = './' + rel;
+      return `${rel}${p2}`;
+    } catch (e) {
+      return `./shared/${p1}.js${p2}`;
+    }
+  });
 
   // Replace relative imports that lack an extension: ./foo or ../bar -> ./foo.js
   // Avoid node builtins and package specifiers (those don't start with ./ or ../)

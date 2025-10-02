@@ -159,7 +159,7 @@ export default function ProfilePage() {
                   </div>
 
                   {user.bio && (
-                    <p className="text-gray-700 leading-relaxed">{user.bio}</p>
+                    <p className="text-muted-foreground leading-relaxed">{user.bio}</p>
                   )}
 
                   <div className="flex flex-wrap gap-4 text-sm text-gray-500">
@@ -326,7 +326,7 @@ export default function ProfilePage() {
                       <ExternalLink className="h-4 w-4 text-gray-400" />
                     </div>
                     {community.description && (
-                      <p className="text-sm text-gray-600 mt-2 line-clamp-2">{community.description}</p>
+                      <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{community.description}</p>
                     )}
                     {community.isLocalCommunity && community.city && (
                       <p className="text-xs text-blue-600 mt-1 flex items-center gap-1">
@@ -392,7 +392,7 @@ export default function ProfilePage() {
                             {post.title}
                           </h3>
                         </Link>
-                        <p className="text-sm text-gray-600 line-clamp-2 mb-2">{post.content}</p>
+                        <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{post.content}</p>
                         <div className="flex items-center gap-4 text-sm text-gray-500">
                           <span className="flex items-center gap-1">
                             <Heart className="h-3 w-3" />

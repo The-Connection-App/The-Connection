@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { insertEventSchema } from "./shared/schema.js";
+import { insertEventSchema } from "../shared/schema.js";
 import { isAuthenticated } from "../auth.js";
 import { storage as storageReal } from "../storage.js";
 const storage = storageReal;

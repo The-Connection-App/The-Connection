@@ -32,7 +32,7 @@ router.put("/settings", async (req, res) => {
     if (!userId) {
       return res.status(401).json({ message: "Not authenticated" });
     }
-    const { displayName, email, bio, city, state, zipCode } = req.body;
+    const { displayName, email, bio, city, state, zipCode, notifyDMs, notifyCommunities, notifyForums, notifyFeed } = req.body;
     const updateData = {};
     if (displayName !== void 0) updateData.displayName = displayName;
     if (email !== void 0) updateData.email = email;
@@ -42,6 +42,14 @@ router.put("/settings", async (req, res) => {
     if (zipCode !== void 0) updateData.zipCode = zipCode;
     const resolvedUserId2 = typeof userId === "number" ? userId : parseInt(String(userId));
     await storage.updateUser(resolvedUserId2, updateData);
+    const notifPrefs = {};
+    if (notifyDMs !== void 0) notifPrefs.notifyDMs = notifyDMs;
+    if (notifyCommunities !== void 0) notifPrefs.notifyCommunities = notifyCommunities;
+    if (notifyForums !== void 0) notifPrefs.notifyForums = notifyForums;
+    if (notifyFeed !== void 0) notifPrefs.notifyFeed = notifyFeed;
+    if (Object.keys(notifPrefs).length > 0) {
+      await storage.updateNotificationPreferences(resolvedUserId2, notifPrefs);
+    }
     res.json({ success: true });
   } catch (error) {
     console.error("Error updating user settings:", error);

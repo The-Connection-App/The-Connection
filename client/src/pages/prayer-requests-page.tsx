@@ -301,7 +301,7 @@ export default function PrayerRequestsPage() {
                 <Card>
                   <CardContent className="p-6 text-center">
                     <h3 className="text-lg font-medium mb-2">No prayer requests yet</h3>
-                    <p className="text-muted-foreground mb-4">Be the first to share a prayer request with the community.</p>
+                    <p className="text-muted-foreground mb-4">Be the first to light a spark with a prayer request in the community.</p>
                     {user ? (
                       <Button onClick={() => setIsCreateDialogOpen(true)}>
                         <PlusIcon className="mr-2 h-4 w-4" />
@@ -350,7 +350,7 @@ export default function PrayerRequestsPage() {
                     <p className="text-muted-foreground mb-4">Share your prayer needs with the community.</p>
                     <Button onClick={() => setIsCreateDialogOpen(true)}>
                       <PlusIcon className="mr-2 h-4 w-4" />
-                      Share Prayer Request
+                      Light a Spark
                     </Button>
                   </CardContent>
                 </Card>
@@ -448,9 +448,9 @@ export default function PrayerRequestsPage() {
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="sm:max-w-[550px]">
           <DialogHeader>
-            <DialogTitle>Share a Prayer Request</DialogTitle>
+            <DialogTitle>Light a Spark: Prayer Request</DialogTitle>
             <DialogDescription>
-              Share your prayer needs with the community. Others will be able to pray for you.
+              Light a spark — share your prayer needs with the community. Others will be able to pray for you.
             </DialogDescription>
           </DialogHeader>
           
@@ -568,19 +568,19 @@ export default function PrayerRequestsPage() {
       {/* Mark as Answered Dialog */}
       <Dialog open={answerDialogOpen} onOpenChange={setAnswerDialogOpen}>
         <DialogContent className="sm:max-w-[550px]">
-          <DialogHeader>
-            <DialogTitle>Share How God Answered Your Prayer</DialogTitle>
+            <DialogHeader>
+            <DialogTitle>Light a Spark: Testimony</DialogTitle>
             <DialogDescription>
-              Share your testimony of how God answered this prayer. Your testimony will encourage the community.
+              Light a spark — share your testimony of how God answered this prayer. Your testimony will encourage the community.
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="answer-description">How was your prayer answered?</Label>
-              <Textarea
+                <Textarea
                 id="answer-description"
-                placeholder="Share how God answered your prayer..."
+                placeholder="Light a spark — share how God answered your prayer..."
                 className="min-h-[150px]"
                 value={answerDescription}
                 onChange={(e) => setAnswerDescription(e.target.value)}
@@ -603,7 +603,7 @@ export default function PrayerRequestsPage() {
               onClick={handleMarkAsAnswered}
               disabled={markAsAnsweredMutation.isPending || !answerDescription.trim()}
             >
-              {markAsAnsweredMutation.isPending ? "Submitting..." : "Share Testimony"}
+              {markAsAnsweredMutation.isPending ? "Submitting..." : "Light a Spark"}
             </Button>
           </DialogFooter>
         </DialogContent>

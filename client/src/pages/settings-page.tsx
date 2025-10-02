@@ -70,6 +70,11 @@ export default function SettingsPage() {
         zipCode: user.zipCode || "",
         email: user.email || "",
       });
+      // Load notification preferences from user object if present
+      setNotifyDMs(user.notifyDMs !== false);
+      setNotifyCommunities(user.notifyCommunities !== false);
+      setNotifyForums(user.notifyForums !== false);
+      setNotifyFeed(user.notifyFeed !== false);
     }
   }, [user]);
 
@@ -80,6 +85,12 @@ export default function SettingsPage() {
     showLocation: true,
     showInterests: true,
   });
+
+  // Notification preference states
+  const [notifyDMs, setNotifyDMs] = useState(true);
+  const [notifyCommunities, setNotifyCommunities] = useState(true);
+  const [notifyForums, setNotifyForums] = useState(true);
+  const [notifyFeed, setNotifyFeed] = useState(true);
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -155,7 +166,13 @@ export default function SettingsPage() {
       const response = await fetch("/api/user/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(profileData),
+        body: JSON.stringify({
+          ...profileData,
+          notifyDMs,
+          notifyCommunities,
+          notifyForums,
+          notifyFeed,
+        }),
       });
       
       if (response.ok) {
@@ -210,7 +227,7 @@ export default function SettingsPage() {
       <div className="container mx-auto py-8">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Please Log In</h1>
-          <p className="text-gray-600">You need to be logged in to access settings.</p>
+          <p className="text-muted-foreground">You need to be logged in to access settings.</p>
         </div>
       </div>
     );
@@ -220,7 +237,7 @@ export default function SettingsPage() {
     <div className="container mx-auto py-8 px-4 max-w-4xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Account Settings</h1>
-        <p className="text-gray-600">Manage your account preferences and security settings</p>
+        <p className="text-muted-foreground">Manage your account preferences and security settings</p>
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
@@ -269,7 +286,7 @@ export default function SettingsPage() {
                   </Avatar>
                   <div>
                     <h3 className="font-semibold text-lg">{user.displayName || user.username}</h3>
-                    <p className="text-gray-600">{user.email}</p>
+                    <p className="text-muted-foreground">{user.email}</p>
                     <Button variant="outline" size="sm" className="mt-2">
                       Change Avatar
                     </Button>
@@ -399,7 +416,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <div className="text-base font-medium">Email Notifications</div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-muted-foreground">
                     Receive notifications via email
                   </div>
                 </div>
@@ -414,7 +431,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <div className="text-base font-medium">Push Notifications</div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-muted-foreground">
                     Receive browser push notifications
                   </div>
                 </div>
@@ -424,6 +441,63 @@ export default function SettingsPage() {
                     setPreferences(prev => ({ ...prev, pushNotifications: checked }))
                   }
                 />
+              </div>
+
+              <div className="mt-4 border-t pt-4">
+                <h3 className="text-lg font-semibold mb-3">Push Notifications</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="text-sm font-medium">Direct Messages</label>
+                      <p className="text-xs text-muted-foreground">Get notified of new DMs</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={notifyDMs}
+                      onChange={(e) => setNotifyDMs(e.target.checked)}
+                      className="h-4 w-4"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="text-sm font-medium">Communities</label>
+                      <p className="text-xs text-muted-foreground">New posts in your communities</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={notifyCommunities}
+                      onChange={(e) => setNotifyCommunities(e.target.checked)}
+                      className="h-4 w-4"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="text-sm font-medium">Forums</label>
+                      <p className="text-xs text-muted-foreground">Forum replies and mentions</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={notifyForums}
+                      onChange={(e) => setNotifyForums(e.target.checked)}
+                      className="h-4 w-4"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="text-sm font-medium">Feed Activity</label>
+                      <p className="text-xs text-muted-foreground">Likes, comments, and shares</p>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={notifyFeed}
+                      onChange={(e) => setNotifyFeed(e.target.checked)}
+                      className="h-4 w-4"
+                    />
+                  </div>
+                </div>
               </div>
 
               <Button>Save Notification Settings</Button>
@@ -446,7 +520,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <div className="text-base font-medium">Show Location</div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-muted-foreground">
                     Display your city and state on your profile
                   </div>
                 </div>
@@ -461,7 +535,7 @@ export default function SettingsPage() {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <div className="text-base font-medium">Show Interests</div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-muted-foreground">
                     Display your interests and topics on your profile
                   </div>
                 </div>
@@ -561,7 +635,7 @@ export default function SettingsPage() {
               <div className="text-center py-8">
                 <Building className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">No Church Account</h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-muted-foreground mb-4">
                   Create a church account to access advanced features like member management, 
                   event planning, and premium tools.
                 </p>

@@ -1,8 +1,8 @@
 import express from "express";
 import { db } from "../db.js";
-import { organizations, organizationUsers, users } from "./shared/schema.js";
+import { organizations, organizationUsers, users } from "../shared/schema.js";
 import { eq, and } from "drizzle-orm";
-import { insertOrganizationSchema } from "./shared/schema.js";
+import { insertOrganizationSchema } from "../shared/schema.js";
 const router = express.Router();
 const requireAuth = (req, res, next) => {
   if (!req.session || !req.session.userId) {

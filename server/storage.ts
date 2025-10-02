@@ -17,6 +17,7 @@ import {
   Microblog, InsertMicroblog,
   MicroblogLike, InsertMicroblogLike,
   UserPreferences, InsertUserPreferences,
+  PushToken, InsertPushToken,
 
   // Apologetics system
   ApologeticsTopic, InsertApologeticsTopic,
@@ -38,6 +39,7 @@ import {
 
   // Direct messaging
   Message, InsertMessage,
+  Connection, InsertConnection,
 
   // Moderation types
   ContentReport, InsertContentReport,
@@ -46,6 +48,8 @@ import {
   // Database tables
   users, communities, communityMembers, communityInvitations, communityChatRooms, chatMessages, communityWallPosts,
   posts, comments, groups, groupMembers, apologeticsResources,
+  connections,
+  pushTokens,
   livestreams, microblogs, microblogLikes,
   apologeticsTopics, apologeticsQuestions, apologeticsAnswers,
   events, eventRsvps, prayerRequests, prayers,
@@ -241,6 +245,19 @@ export interface IStorage {
   createPrayer(prayer: InsertPrayer): Promise<Prayer>;
   getPrayersForRequest(prayerRequestId: number): Promise<Prayer[]>;
   getUserPrayedRequests(userId: number): Promise<number[]>;
+
+  // Push token methods
+  savePushToken(token: InsertPushToken): Promise<PushToken>;
+  getUserPushTokens(userId: number): Promise<PushToken[]>;
+  deletePushToken(token: string): Promise<boolean>;
+
+  // Notification preferences
+  updateNotificationPreferences(userId: number, preferences: {
+    notifyDMs?: boolean;
+    notifyCommunities?: boolean;
+    notifyForums?: boolean;
+    notifyFeed?: boolean;
+  }): Promise<void>;
   
   // Apologetics Q&A methods
   getAllApologeticsTopics(): Promise<ApologeticsTopic[]>;
@@ -329,6 +346,11 @@ export interface IStorage {
   // Direct Messaging methods
   getDirectMessages(userId1: number, userId2: number): Promise<any[]>;
   createDirectMessage(message: any): Promise<any>;
+  // Connection methods
+  getConnectionBetween(userId1: number, userId2: number): Promise<Connection | undefined>;
+  createConnection(connection: InsertConnection): Promise<Connection>;
+  getConnectionsFor(userId: number): Promise<Connection[]>;
+  updateConnectionStatus(connectionId: number, status: string, actingUserId: number): Promise<Connection>;
   // Moderation methods
   createContentReport(report: InsertContentReport): Promise<ContentReport>;
   createUserBlock(block: InsertUserBlock): Promise<UserBlock>;
@@ -435,6 +457,7 @@ export class MemStorage implements IStorage {
     bibleStudyNotes: [] as BibleStudyNote[],
     userPreferences: [] as UserPreferences[],
     messages: [] as Message[],
+    connections: [] as any[],
     // Moderation in-memory stores
     contentReports: [] as any[],
     userBlocks: [] as any[],
@@ -519,6 +542,11 @@ export class MemStorage implements IStorage {
         latitude: user.latitude || null,
         longitude: user.longitude || null,
       onboardingCompleted: user.onboardingCompleted || false,
+      dmPrivacy: user.dmPrivacy || 'everyone',
+  notifyDMs: user.notifyDMs !== undefined ? user.notifyDMs : true,
+  notifyCommunities: user.notifyCommunities !== undefined ? user.notifyCommunities : true,
+  notifyForums: user.notifyForums !== undefined ? user.notifyForums : true,
+  notifyFeed: user.notifyFeed !== undefined ? user.notifyFeed : true,
       isVerifiedApologeticsAnswerer: false,
       isAdmin: user.isAdmin || false,
       createdAt: new Date(),
@@ -527,6 +555,61 @@ export class MemStorage implements IStorage {
     };
     this.data.users.push(newUser);
     return newUser;
+  }
+
+  // Push token in-memory storage
+  // ...existing code...
+
+  async getUserPushTokens(userId: number): Promise<PushToken[]> {
+    // In-memory representation may not exist; return empty
+    // We store tokens in a dedicated array under data if present
+    // If not present, return empty
+    const store = (this.data as any).pushTokens as PushToken[] | undefined;
+    if (!store) return [];
+    return store.filter(t => t.userId === userId) as PushToken[];
+  }
+
+  async savePushToken(token: InsertPushToken): Promise<PushToken> {
+    if (!(this.data as any).pushTokens) (this.data as any).pushTokens = [];
+    const store = (this.data as any).pushTokens as PushToken[];
+    const t = token as any;
+    const existing = store.find(s => s.token === t.token);
+    if (existing) {
+      existing.lastUsed = new Date();
+      existing.userId = t.userId;
+      existing.platform = t.platform;
+      return existing;
+    }
+    const newToken: any = {
+      id: this.nextId++,
+      userId: t.userId,
+      token: t.token,
+      platform: t.platform,
+      createdAt: new Date(),
+      lastUsed: new Date()
+    };
+    store.push(newToken);
+    return newToken as PushToken;
+  }
+
+  async updateNotificationPreferences(userId: number, preferences: {
+    notifyDMs?: boolean;
+    notifyCommunities?: boolean;
+    notifyForums?: boolean;
+    notifyFeed?: boolean;
+  }): Promise<void> {
+    const user = this.data.users.find(u => u.id === userId);
+    if (!user) throw new Error('User not found');
+    Object.assign(user, preferences);
+  }
+
+  async deletePushToken(token: string): Promise<boolean> {
+    const store = (this.data as any).pushTokens as PushToken[] | undefined;
+    if (!store) return true;
+    const idx = store.findIndex(t => t.token === token);
+    if (idx === -1) return true;
+    store.splice(idx, 1);
+    return true;
   }
   
   async updateUserPassword(userId: number, hashedPassword: string): Promise<User | undefined> {
@@ -1774,6 +1857,56 @@ export class MemStorage implements IStorage {
     return newMessage;
   }
 
+  // Connection methods
+  async getConnectionBetween(userId1: number, userId2: number): Promise<Connection | undefined> {
+    return this.data.connections.find((c: any) =>
+      (c.userId === userId1 && c.connectedUserId === userId2) ||
+      (c.userId === userId2 && c.connectedUserId === userId1)
+    ) as Connection | undefined;
+  }
+
+  async createConnection(connection: any): Promise<Connection> {
+    const newConnection: any = {
+      id: this.nextId++,
+      userId: connection.userId,
+      connectedUserId: connection.connectedUserId,
+      status: connection.status || 'pending',
+      createdAt: new Date()
+    };
+    this.data.connections.push(newConnection);
+    return newConnection as Connection;
+  }
+
+  async getConnectionsFor(userId: number): Promise<Connection[]> {
+    return this.data.connections.filter((c: any) => c.userId === userId || c.connectedUserId === userId) as Connection[];
+  }
+
+  async updateConnectionStatus(connectionId: number, status: string, actingUserId: number): Promise<Connection> {
+    const connIdx = this.data.connections.findIndex((c: any) => c.id === connectionId);
+    if (connIdx === -1) throw new Error('Connection not found');
+    const conn = this.data.connections[connIdx];
+
+    if (status === 'accepted') {
+      if (conn.connectedUserId !== actingUserId) throw new Error('Not authorized to accept this connection');
+      conn.status = 'accepted';
+      return conn as Connection;
+    }
+
+    if (status === 'blocked') {
+      if (conn.connectedUserId !== actingUserId && conn.userId !== actingUserId) throw new Error('Not authorized to block this connection');
+      conn.status = 'blocked';
+      return conn as Connection;
+    }
+
+    // Generic update allowed if acting user is part of connection
+    if (conn.connectedUserId === actingUserId || conn.userId === actingUserId) {
+      conn.status = status;
+      return conn as Connection;
+    }
+
+    throw new Error('Not authorized to update this connection');
+  }
+
   // Moderation methods (in-memory)
   async createContentReport(report: any): Promise<ContentReport> {
     const newReport: any = {
@@ -1873,6 +2006,53 @@ export class DbStorage implements IStorage {
     return await db.select().from(users).where(whereNotDeleted(users));
   }
 
+  // Connection methods (DB)
+  async getConnectionBetween(userId1: number, userId2: number): Promise<Connection | undefined> {
+    const rows = await db.select().from(connections).where(or(
+      and(eq(connections.userId, userId1), eq(connections.connectedUserId, userId2)),
+      and(eq(connections.userId, userId2), eq(connections.connectedUserId, userId1))
+    ));
+    return rows[0];
+  }
+
+  async createConnection(connection: InsertConnection): Promise<Connection> {
+    const [row] = await db.insert(connections).values(connection as any).returning();
+    return row as Connection;
+  }
+
+  async getConnectionsFor(userId: number): Promise<Connection[]> {
+    // Return rows where user is either side of the connection
+    const rows = await db.select().from(connections).where(or(eq(connections.userId, userId), eq(connections.connectedUserId, userId)));
+    return rows as Connection[];
+  }
+
+  async updateConnectionStatus(connectionId: number, status: string, actingUserId: number): Promise<Connection> {
+    // Ensure the acting user is part of the connection (either requester or recipient)
+    const rows = await db.select().from(connections).where(eq(connections.id, connectionId));
+    const conn = rows[0] as any;
+    if (!conn) throw new Error('Connection not found');
+
+    if (status === 'accepted') {
+      if (conn.connectedUserId !== actingUserId) throw new Error('Not authorized to accept this connection');
+      const updated = await db.update(connections).set({ status }).where(eq(connections.id, connectionId)).returning();
+      return updated[0] as Connection;
+    }
+
+    if (status === 'blocked') {
+      if (conn.connectedUserId !== actingUserId && conn.userId !== actingUserId) throw new Error('Not authorized to block this connection');
+      const updated = await db.update(connections).set({ status }).where(eq(connections.id, connectionId)).returning();
+      return updated[0] as Connection;
+    }
+
+    // Generic update if acting user is part of connection
+    if (conn.connectedUserId === actingUserId || conn.userId === actingUserId) {
+      const updated = await db.update(connections).set({ status }).where(eq(connections.id, connectionId)).returning();
+      return updated[0] as Connection;
+    }
+
+    throw new Error('Not authorized to update this connection');
+  }
+
   // Moderation methods (DB)
   async createContentReport(report: InsertContentReport): Promise<ContentReport> {
   const [row] = await db.insert(contentReports).values(report as any).returning();
@@ -1957,6 +2137,37 @@ export class DbStorage implements IStorage {
   
   async getVerifiedApologeticsAnswerers(): Promise<User[]> {
     return await db.select().from(users).where(and(eq(users.isVerifiedApologeticsAnswerer, true), whereNotDeleted(users)));
+  }
+
+  // Push token methods
+  async getUserPushTokens(userId: number): Promise<PushToken[]> {
+    const rows = await db.select().from(pushTokens).where(eq(pushTokens.userId, userId));
+    return rows as PushToken[];
+  }
+
+  async savePushToken(token: InsertPushToken): Promise<PushToken> {
+    // Upsert behavior: if token exists, update lastUsed and userId; otherwise insert
+    try {
+      const inserted = await db.insert(pushTokens).values(token as any).onConflictDoUpdate({
+        target: pushTokens.token,
+        set: { lastUsed: new Date(), userId: (token as any).userId as any }
+      }).returning();
+      return inserted[0] as PushToken;
+    } catch (err) {
+      // Fallback: try to update existing token
+      const updated = await db.update(pushTokens).set({ lastUsed: new Date(), platform: (token as any).platform } as any).where(eq(pushTokens.token, (token as any).token)).returning();
+      if (updated && updated[0]) return updated[0] as PushToken;
+      throw err;
+    }
+  }
+
+  async updateNotificationPreferences(userId: number, preferences: any): Promise<void> {
+    await db.update(users).set(preferences as any).where(eq(users.id, userId));
+  }
+
+  async deletePushToken(token: string): Promise<boolean> {
+    const res = await db.delete(pushTokens).where(eq(pushTokens.token, token));
+    return true;
   }
   
   // Community methods - simplified for now

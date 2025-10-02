@@ -128,7 +128,7 @@ export default function Connect() {
               <CardTitle className="mt-4">{feature.title}</CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription className="text-gray-700">{feature.description}</CardDescription>
+              <CardDescription className="text-muted-foreground">{feature.description}</CardDescription>
             </CardContent>
             <CardFooter>
               <Button variant="outline" className="w-full" asChild>

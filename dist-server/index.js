@@ -25,10 +25,10 @@ let sessionOptions = {
     maxAge: 30 * 24 * 60 * 60 * 1e3,
     // 30 days
     secure: false,
-    // Disable secure for development
+    // will be overridden to true in production when behind HTTPS
     httpOnly: true,
+    // default to lax for development; in production we may need 'none' for cross-site cookies
     sameSite: "lax"
-    // Allow cross-origin requests in development
   }
 };
 if (USE_DB) {
@@ -39,6 +39,21 @@ if (USE_DB) {
     createTableIfMissing: true
   });
   sessionOptions.store = sessionStore;
+}
+if (process.env.NODE_ENV === "production") {
+  if (!process.env.SESSION_SECRET) {
+    console.error("FATAL: SESSION_SECRET must be set in production");
+    process.exit(1);
+  }
+  if (process.env.TRUST_PROXY !== "false") {
+    app.set("trust proxy", 1);
+  }
+  sessionOptions.cookie.secure = true;
+  const preferNone = Boolean(process.env.FORCE_SAMESITE_NONE === "true" || process.env.BASE_URL || process.env.APP_DOMAIN);
+  sessionOptions.cookie.sameSite = preferNone ? "none" : "lax";
+  if (process.env.APP_DOMAIN) {
+    sessionOptions.cookie.domain = process.env.APP_DOMAIN;
+  }
 }
 app.use(session(sessionOptions));
 app.use(passport.initialize());
@@ -74,6 +89,18 @@ app.use(cors({
   ].filter(Boolean),
   credentials: true
 }));
+if (process.env.NODE_ENV !== "production" && process.env.DEV_AUTHS === "true") {
+  app.use(async (req, _res, next) => {
+    try {
+      const devUserId = Number(process.env.DEV_USER_ID || 0);
+      if (devUserId && !req.session?.userId) {
+        req.session.userId = devUserId;
+      }
+    } catch (e) {
+    }
+    next();
+  });
+}
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;

@@ -1,0 +1,50 @@
+/* Force visible input/textarea/textbox text color to avoid accidental transparent/text-fill issues
+   This is a targeted, temporary debug override to surface hidden text during development.
+   It handles common utility classes and parent opacity/mix-blend issues. */
+:root {
+  /* keep in sync with Tailwind variables */
+  --app-foreground: hsl(var(--foreground));
+}
+
+/* Base elements */
+input, textarea, [contenteditable], .ProseMirror, [role="textbox"] {
+  color: var(--app-foreground) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  -webkit-text-fill-color: var(--app-foreground) !important; /* Safari */
+  -webkit-text-stroke-color: var(--app-foreground) !important;
+  mix-blend-mode: normal !important;
+  text-indent: 0 !important;
+}
+
+/* If a parent has opacity or transform, inputs can still inherit visual hiding; ensure high specificity fallback */
+*:has(input), *:has(textarea), *:has([contenteditable]) {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Common utility classes that hide text */
+.text-transparent, .opacity-0, .invisible, .hidden { 
+  color: var(--app-foreground) !important;
+  -webkit-text-fill-color: var(--app-foreground) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Placeholder styles - keep them legible but slightly muted */
+input::placeholder, textarea::placeholder, [contenteditable]::placeholder {
+  color: rgba(255,255,255,0.6) !important;
+}
+
+.dark input, .dark textarea, .dark [contenteditable], .dark .ProseMirror, .dark [role="textbox"] {
+  color: hsl(var(--foreground)) !important;
+  -webkit-text-fill-color: hsl(var(--foreground)) !important;
+}
+
+/* If third-party widgets place tiny invisible inputs (e.g., file pickers), ensure they remain interactive but visible to assist debugging */
+input[type="file"], input[type="file"]::file-selector-button {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* End of temporary debug override */

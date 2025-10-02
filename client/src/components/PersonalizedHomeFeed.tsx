@@ -64,7 +64,7 @@ export function PersonalizedHomeFeed() {
               </Button>
             </div>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Faith-focused recommendations: Engagement (40%) + Relationships (30%) + Topic Match (20%) + Freshness (10%)
           </p>
         </CardHeader>
@@ -149,7 +149,7 @@ export function PersonalizedHomeFeed() {
       {feed && (
         <Card className="bg-gray-50">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between text-xs text-gray-600">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span>Updated: {new Date(feed.timestamp).toLocaleTimeString()}</span>
               <span className="flex items-center gap-1">
                 <Brain className="w-3 h-3" />

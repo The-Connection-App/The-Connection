@@ -164,7 +164,7 @@ export default function AdminModerationPage() {
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Content Moderation</h1>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           Review and manage reported content to maintain community standards.
         </p>
       </div>
@@ -191,7 +191,7 @@ export default function AdminModerationPage() {
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               No {filter} reports
             </h3>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               {filter === 'pending' 
                 ? "Great! There are no pending reports to review."
                 : `No ${filter} reports found.`
@@ -275,7 +275,7 @@ export default function AdminModerationPage() {
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b">
               <h3 className="text-lg font-semibold">Review Report #{selectedReport.id}</h3>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 Take action on this content report
               </p>
             </div>
@@ -299,7 +299,7 @@ export default function AdminModerationPage() {
               {selectedReport.description && (
                 <div>
                   <span className="font-medium text-sm">Reporter's description:</span>
-                  <p className="text-sm text-gray-700 mt-1 p-3 bg-gray-50 rounded border">
+                  <p className="text-sm text-muted-foreground mt-1 p-3 bg-gray-50 rounded border">
                     {selectedReport.description}
                   </p>
                 </div>
@@ -318,7 +318,7 @@ export default function AdminModerationPage() {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Review notes (optional)
                 </label>
                 <Textarea

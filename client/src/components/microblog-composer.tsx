@@ -206,7 +206,7 @@ export function MicroblogComposer({
           
           <div className="flex-1">
             <Textarea
-              placeholder={parentId ? "Write your reply..." : "What's on your mind?"}
+              placeholder={parentId ? "Write your reply..." : "Spark up some conversation..."}
               className="border-none resize-none focus-visible:ring-0 focus-visible:ring-offset-0 h-24"
               value={content}
               onChange={handleContentChange}

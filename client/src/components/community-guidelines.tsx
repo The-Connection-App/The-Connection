@@ -30,7 +30,7 @@ export default function CommunityGuidelines() {
   return (
     <Card>
       <CardHeader className="px-4 py-3 bg-neutral-50 border-b border-neutral-200">
-        <CardTitle className="font-semibold text-neutral-800">
+        <CardTitle className="font-semibold text-card-foreground">
           Community Guidelines
         </CardTitle>
       </CardHeader>

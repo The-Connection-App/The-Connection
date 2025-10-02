@@ -1,0 +1,6 @@
+ReferenceError: MutationObserver is not defined
+    at file:///workspaces/The-Connection/dist/public/assets/index-WPLG5R77.js:2:878
+    at file:///workspaces/The-Connection/dist/public/assets/index-WPLG5R77.js:2:1394
+    at ModuleJob.run (node:internal/modules/esm/module_job:329:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)
+    at async run (file:///workspaces/The-Connection/scripts/run_bundle_in_jsdom.mjs:51:5)

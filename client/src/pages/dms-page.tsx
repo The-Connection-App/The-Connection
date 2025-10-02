@@ -111,7 +111,7 @@ export default function DMsPage() {
               }`}
             >
               <div className="font-semibold">{conv.name}</div>
-              <div className="text-sm text-gray-600 truncate">{conv.lastMessage}</div>
+              <div className="text-sm text-muted-foreground truncate">{conv.lastMessage}</div>
             </div>
           ))}
         </div>
@@ -127,7 +127,7 @@ export default function DMsPage() {
                 {conversations.find(c => c.id === selectedUserId)?.name || `User ${selectedUserId}`}
               </h3>
               {userIdFromUrl && (
-                <p className="text-sm text-gray-600">Direct conversation</p>
+                <p className="text-sm text-muted-foreground">Direct conversation</p>
               )}
             </div>
 

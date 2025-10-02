@@ -3,6 +3,8 @@ import {
   communities,
   communityWallPosts,
   groupMembers,
+  connections,
+  pushTokens,
   livestreams,
   events,
   prayerRequests,
@@ -13,7 +15,7 @@ import {
   userBlocks
 } from "./shared/schema.js";
 import { db } from "./db.js";
-import { eq, and, or, inArray, like } from "drizzle-orm";
+import { eq, and, or, desc, inArray, like } from "drizzle-orm";
 import { whereNotDeleted } from "./db/helpers.js";
 import { geocodeAddress } from "./geocoding.js";
 import softDelete from "./db/softDelete.js";
@@ -271,6 +273,7 @@ class MemStorage {
     bibleStudyNotes: [],
     userPreferences: [],
     messages: [],
+    connections: [],
     // Moderation in-memory stores
     contentReports: [],
     userBlocks: []
@@ -339,6 +342,11 @@ class MemStorage {
       latitude: user.latitude || null,
       longitude: user.longitude || null,
       onboardingCompleted: user.onboardingCompleted || false,
+      dmPrivacy: user.dmPrivacy || "everyone",
+      notifyDMs: user.notifyDMs !== void 0 ? user.notifyDMs : true,
+      notifyCommunities: user.notifyCommunities !== void 0 ? user.notifyCommunities : true,
+      notifyForums: user.notifyForums !== void 0 ? user.notifyForums : true,
+      notifyFeed: user.notifyFeed !== void 0 ? user.notifyFeed : true,
       isVerifiedApologeticsAnswerer: false,
       isAdmin: user.isAdmin || false,
       createdAt: /* @__PURE__ */ new Date(),
@@ -347,6 +355,48 @@ class MemStorage {
     };
     this.data.users.push(newUser);
     return newUser;
+  }
+  // Push token in-memory storage
+  // ...existing code...
+  async getUserPushTokens(userId) {
+    const store = this.data.pushTokens;
+    if (!store) return [];
+    return store.filter((t) => t.userId === userId);
+  }
+  async savePushToken(token) {
+    if (!this.data.pushTokens) this.data.pushTokens = [];
+    const store = this.data.pushTokens;
+    const t = token;
+    const existing = store.find((s) => s.token === t.token);
+    if (existing) {
+      existing.lastUsed = /* @__PURE__ */ new Date();
+      existing.userId = t.userId;
+      existing.platform = t.platform;
+      return existing;
+    }
+    const newToken = {
+      id: this.nextId++,
+      userId: t.userId,
+      token: t.token,
+      platform: t.platform,
+      createdAt: /* @__PURE__ */ new Date(),
+      lastUsed: /* @__PURE__ */ new Date()
+    };
+    store.push(newToken);
+    return newToken;
+  }
+  async updateNotificationPreferences(userId, preferences) {
+    const user = this.data.users.find((u) => u.id === userId);
+    if (!user) throw new Error("User not found");
+    Object.assign(user, preferences);
+  }
+  async deletePushToken(token) {
+    const store = this.data.pushTokens;
+    if (!store) return true;
+    const idx = store.findIndex((t) => t.token === token);
+    if (idx === -1) return true;
+    store.splice(idx, 1);
+    return true;
   }
   async updateUserPassword(userId, hashedPassword) {
     const user = this.data.users.find((u) => u.id === userId);
@@ -1330,6 +1380,46 @@ class MemStorage {
     this.data.messages.push(newMessage);
     return newMessage;
   }
+  // Connection methods
+  async getConnectionBetween(userId1, userId2) {
+    return this.data.connections.find(
+      (c) => c.userId === userId1 && c.connectedUserId === userId2 || c.userId === userId2 && c.connectedUserId === userId1
+    );
+  }
+  async createConnection(connection) {
+    const newConnection = {
+      id: this.nextId++,
+      userId: connection.userId,
+      connectedUserId: connection.connectedUserId,
+      status: connection.status || "pending",
+      createdAt: /* @__PURE__ */ new Date()
+    };
+    this.data.connections.push(newConnection);
+    return newConnection;
+  }
+  async getConnectionsFor(userId) {
+    return this.data.connections.filter((c) => c.userId === userId || c.connectedUserId === userId);
+  }
+  async updateConnectionStatus(connectionId, status, actingUserId) {
+    const connIdx = this.data.connections.findIndex((c) => c.id === connectionId);
+    if (connIdx === -1) throw new Error("Connection not found");
+    const conn = this.data.connections[connIdx];
+    if (status === "accepted") {
+      if (conn.connectedUserId !== actingUserId) throw new Error("Not authorized to accept this connection");
+      conn.status = "accepted";
+      return conn;
+    }
+    if (status === "blocked") {
+      if (conn.connectedUserId !== actingUserId && conn.userId !== actingUserId) throw new Error("Not authorized to block this connection");
+      conn.status = "blocked";
+      return conn;
+    }
+    if (conn.connectedUserId === actingUserId || conn.userId === actingUserId) {
+      conn.status = status;
+      return conn;
+    }
+    throw new Error("Not authorized to update this connection");
+  }
   // Moderation methods (in-memory)
   async createContentReport(report) {
     const newReport = {
@@ -1365,6 +1455,24 @@ class MemStorage {
   async getBlockedUserIdsFor(blockerId) {
     return this.data.userBlocks.filter((b) => b.blockerId === blockerId).map((b) => b.blockedId);
   }
+  // Admin moderation helpers (in-memory)
+  async getReports(filter) {
+    let rows = this.data.contentReports.slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    if (filter?.status) rows = rows.filter((r) => r.status === filter.status);
+    if (filter?.limit) rows = rows.slice(0, filter.limit);
+    return rows;
+  }
+  async getReportById(id) {
+    return this.data.contentReports.find((r) => r.id === id);
+  }
+  async updateReport(id, update) {
+    const idx = this.data.contentReports.findIndex((r) => r.id === id);
+    if (idx === -1) throw new Error("Report not found");
+    const existing = this.data.contentReports[idx];
+    const updated = { ...existing, ...update, updatedAt: /* @__PURE__ */ new Date() };
+    this.data.contentReports[idx] = updated;
+    return updated;
+  }
 }
 class DbStorage {
   // User methods
@@ -1397,6 +1505,42 @@ class DbStorage {
   async getAllUsers() {
     return await db.select().from(users).where(whereNotDeleted(users));
   }
+  // Connection methods (DB)
+  async getConnectionBetween(userId1, userId2) {
+    const rows = await db.select().from(connections).where(or(
+      and(eq(connections.userId, userId1), eq(connections.connectedUserId, userId2)),
+      and(eq(connections.userId, userId2), eq(connections.connectedUserId, userId1))
+    ));
+    return rows[0];
+  }
+  async createConnection(connection) {
+    const [row] = await db.insert(connections).values(connection).returning();
+    return row;
+  }
+  async getConnectionsFor(userId) {
+    const rows = await db.select().from(connections).where(or(eq(connections.userId, userId), eq(connections.connectedUserId, userId)));
+    return rows;
+  }
+  async updateConnectionStatus(connectionId, status, actingUserId) {
+    const rows = await db.select().from(connections).where(eq(connections.id, connectionId));
+    const conn = rows[0];
+    if (!conn) throw new Error("Connection not found");
+    if (status === "accepted") {
+      if (conn.connectedUserId !== actingUserId) throw new Error("Not authorized to accept this connection");
+      const updated = await db.update(connections).set({ status }).where(eq(connections.id, connectionId)).returning();
+      return updated[0];
+    }
+    if (status === "blocked") {
+      if (conn.connectedUserId !== actingUserId && conn.userId !== actingUserId) throw new Error("Not authorized to block this connection");
+      const updated = await db.update(connections).set({ status }).where(eq(connections.id, connectionId)).returning();
+      return updated[0];
+    }
+    if (conn.connectedUserId === actingUserId || conn.userId === actingUserId) {
+      const updated = await db.update(connections).set({ status }).where(eq(connections.id, connectionId)).returning();
+      return updated[0];
+    }
+    throw new Error("Not authorized to update this connection");
+  }
   // Moderation methods (DB)
   async createContentReport(report) {
     const [row] = await db.insert(contentReports).values(report).returning();
@@ -1411,6 +1555,24 @@ class DbStorage {
   async getBlockedUserIdsFor(blockerId) {
     const rows = await db.select({ blockedId: userBlocks.blockedId }).from(userBlocks).where(eq(userBlocks.blockerId, blockerId));
     return rows.map((r) => r.blockedId);
+  }
+  // Admin moderation helpers (DB)
+  async getReports(filter) {
+    const q = db.select().from(contentReports);
+    if (filter?.status) q.where(eq(contentReports.status, filter.status));
+    q.orderBy(desc(contentReports.createdAt));
+    if (filter?.limit) q.limit(filter.limit);
+    const rows = await q;
+    return rows;
+  }
+  async getReportById(id) {
+    const rows = await db.select().from(contentReports).where(eq(contentReports.id, id));
+    return rows[0];
+  }
+  async updateReport(id, update) {
+    const updated = await db.update(contentReports).set(update).where(eq(contentReports.id, id)).returning();
+    if (!updated || updated.length === 0) throw new Error("Report not found");
+    return updated[0];
   }
   async updateUser(id, userData) {
     const result = await db.update(users).set(userData).where(eq(users.id, id)).returning();
@@ -1446,6 +1608,31 @@ class DbStorage {
   }
   async getVerifiedApologeticsAnswerers() {
     return await db.select().from(users).where(and(eq(users.isVerifiedApologeticsAnswerer, true), whereNotDeleted(users)));
+  }
+  // Push token methods
+  async getUserPushTokens(userId) {
+    const rows = await db.select().from(pushTokens).where(eq(pushTokens.userId, userId));
+    return rows;
+  }
+  async savePushToken(token) {
+    try {
+      const inserted = await db.insert(pushTokens).values(token).onConflictDoUpdate({
+        target: pushTokens.token,
+        set: { lastUsed: /* @__PURE__ */ new Date(), userId: token.userId }
+      }).returning();
+      return inserted[0];
+    } catch (err) {
+      const updated = await db.update(pushTokens).set({ lastUsed: /* @__PURE__ */ new Date(), platform: token.platform }).where(eq(pushTokens.token, token.token)).returning();
+      if (updated && updated[0]) return updated[0];
+      throw err;
+    }
+  }
+  async updateNotificationPreferences(userId, preferences) {
+    await db.update(users).set(preferences).where(eq(users.id, userId));
+  }
+  async deletePushToken(token) {
+    const res = await db.delete(pushTokens).where(eq(pushTokens.token, token));
+    return true;
   }
   // Community methods - simplified for now
   async getAllCommunities() {

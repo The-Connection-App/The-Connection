@@ -229,15 +229,15 @@ export function CommunityFeed({ community, isMember, isOwner, isModerator }: Com
               </DialogTrigger>
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
-                  <DialogTitle>Create a Post</DialogTitle>
+                  <DialogTitle>Light a Spark in the Community</DialogTitle>
                   <DialogDescription>
-                    Share something with the {community.name} community
+                    Spark up some conversation with the {community.name} community
                   </DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-4">
                   <Textarea
-                    placeholder="What's on your mind?"
+                    placeholder="Spark up some conversation..."
                     value={newPostContent}
                     onChange={(e) => setNewPostContent(e.target.value)}
                     className="min-h-32 resize-none"
@@ -350,12 +350,12 @@ export function CommunityFeed({ community, isMember, isOwner, isModerator }: Com
                 <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">No posts yet</h3>
                 <p className="text-muted-foreground mb-4">
-                  Be the first to share something with the community!
+                  Be the first to light a spark with a post in the community!
                 </p>
                 {isMember && (
                   <Button onClick={() => setShowCreatePost(true)} data-testid="button-first-post">
                     <Plus className="h-4 w-4 mr-2" />
-                    Create First Post
+                    Light a Spark
                   </Button>
                 )}
               </CardContent>

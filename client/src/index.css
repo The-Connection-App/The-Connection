@@ -92,9 +92,7 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  /* removed global text-fill/background-clip to prevent making all text transparent */
   }
 
   /* More professional card styling */

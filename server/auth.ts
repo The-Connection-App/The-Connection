@@ -105,7 +105,8 @@ export function setupAuth(app: Express) {
         currentUsername: req.session?.username
       });
       
-      req.session.userId = user.id.toString();
+  // Store as a number so later code can rely on numeric IDs
+  req.session.userId = Number(user.id);
       req.session.username = user.username;
       req.session.isAdmin = user.isAdmin || false;
       
@@ -176,7 +177,8 @@ export function setupAuth(app: Express) {
         }
         
         // Save user ID in session
-        req.session.userId = user.id.toString();
+  // Store as a number so later code can rely on numeric IDs
+  req.session.userId = Number(user.id);
         req.session.username = user.username;
         req.session.isAdmin = user.isAdmin || false;
         req.session.email = user.email;

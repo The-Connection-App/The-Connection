@@ -88,6 +88,15 @@ router.get("/status", (req, res) => {
     responseTime: "24-48 hours"
   });
 });
+router.get("/legal", (req, res) => {
+  res.json({
+    legal: [
+      { title: "Privacy Policy", url: "/privacy.html" },
+      { title: "Terms of Service", url: "/terms.html" },
+      { title: "Community Guidelines", url: "/community-guidelines.html" }
+    ]
+  });
+});
 var support_default = router;
 export {
   support_default as default

@@ -182,7 +182,7 @@ export default function GlobalSearch({ isVisible, onClose, placeholder = "Search
       case 'verse': return <BookOpen className="h-4 w-4 text-orange-600" />;
       case 'event': return <Calendar className="h-4 w-4 text-indigo-600" />;
       case 'prayer': return <HandHeart className="h-4 w-4 text-rose-600" />;
-      default: return <Search className="h-4 w-4 text-gray-600" />;
+      default: return <Search className="h-4 w-4 text-muted-foreground" />;
     }
   };
 

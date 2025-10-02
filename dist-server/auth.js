@@ -64,7 +64,7 @@ function setupAuth(app) {
         currentUserId: req.session?.userId,
         currentUsername: req.session?.username
       });
-      req.session.userId = user.id.toString();
+      req.session.userId = Number(user.id);
       req.session.username = user.username;
       req.session.isAdmin = user.isAdmin || false;
       console.log(`[REGISTRATION] After setting session data for user ${user.username}:`, {
@@ -116,7 +116,7 @@ function setupAuth(app) {
           console.log(`Invalid password for user: ${username}`);
           return res.status(401).json({ message: "Invalid username or password" });
         }
-        req.session.userId = user.id.toString();
+        req.session.userId = Number(user.id);
         req.session.username = user.username;
         req.session.isAdmin = user.isAdmin || false;
         req.session.email = user.email;
@@ -187,6 +187,10 @@ function setupAuth(app) {
         sessionID: req.sessionID
       });
       if (!req.session || !req.session.userId) {
+        if (process.env.NODE_ENV !== "production") {
+          console.log("Unauthenticated /api/user request (dev) - returning null user");
+          return res.status(200).json(null);
+        }
         console.log("Authentication failed - no session or userId");
         return res.status(401).json({ message: "Not authenticated" });
       }

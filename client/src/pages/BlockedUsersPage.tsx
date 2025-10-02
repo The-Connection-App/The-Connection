@@ -77,7 +77,7 @@ export default function BlockedUsersPage() {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Blocked Users</h1>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           Manage users you've blocked. Blocked users can't see your content or interact with you.
         </p>
       </div>
@@ -89,7 +89,7 @@ export default function BlockedUsersPage() {
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               No Blocked Users
             </h3>
-            <p className="text-gray-600 max-w-md mx-auto">
+            <p className="text-muted-foreground max-w-md mx-auto">
               You haven't blocked any users yet. When you block someone, they'll appear here and you can manage them.
             </p>
           </CardContent>
@@ -116,7 +116,7 @@ export default function BlockedUsersPage() {
                             className="w-10 h-10 rounded-full object-cover"
                           />
                         ) : (
-                          <span className="text-gray-600 font-medium text-sm">
+                          <span className="text-muted-foreground font-medium text-sm">
                             {(block.blockedUser.displayName || block.blockedUser.username)[0].toUpperCase()}
                           </span>
                         )}

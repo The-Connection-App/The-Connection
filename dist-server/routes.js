@@ -23,7 +23,11 @@ import postsRoutes from "./routes/posts.js";
 import communitiesRoutes from "./routes/communities.js";
 import eventsRoutes from "./routes/events.js";
 import apologeticsRoutes from "./routes/apologetics.js";
-function registerRoutes(app, httpServer) {
+import moderationRoutes from "./routes/moderation.js";
+import forumsRoutes from "./routes/forums.js";
+import connectionsRoutes from "./routes/api/connections.js";
+import pushTokensRoutes from "./routes/pushTokens.js";
+async function registerRoutes(app, httpServer) {
   setupAuth(app);
   app.use((req, _res, next) => {
     const raw = req.session.userId;
@@ -94,14 +98,20 @@ function registerRoutes(app, httpServer) {
   if (FEATURES.AUTH) {
     app.use("/api", authRoutes);
     app.use("/api", accountRoutes);
-    const safetyRoutes = require("./routes/safety").default;
+    app.use("/api", connectionsRoutes);
+    const safetyMod = await import("./routes/safety.js");
+    const safetyRoutes = safetyMod && safetyMod.default || safetyMod;
     app.use("/api", safetyRoutes);
+    app.use("/api", moderationRoutes);
   }
   if (FEATURES.ORGS) {
     app.use("/api/admin", adminRoutes);
   }
   if (FEATURES.NOTIFICATIONS || FEATURES.COMMUNITIES || FEATURES.POSTS || FEATURES.FEED) {
     app.use("/api/support", supportRoutes);
+    if (FEATURES.NOTIFICATIONS) {
+      app.use("/api/push-tokens", pushTokensRoutes);
+    }
   }
   app.use("/api/mvp", mvpRoutes);
   if (FEATURES.FEED) {
@@ -113,6 +123,7 @@ function registerRoutes(app, httpServer) {
   if (FEATURES.COMMUNITIES) {
     app.use("/api", communitiesRoutes);
   }
+  app.use("/api", forumsRoutes);
   if (FEATURES.EVENTS) {
     app.use("/api", eventsRoutes);
   }
@@ -130,13 +141,16 @@ function registerRoutes(app, httpServer) {
     try {
       const userId = getSessionUserId(req);
       if (!userId) {
-        return res.status(401).json({ message: "Not authenticated" });
-      }
-      if (userId === void 0) {
+        if (process.env.NODE_ENV !== "production") {
+          return res.status(200).json(null);
+        }
         return res.status(401).json({ message: "Not authenticated" });
       }
       const user = await storage.getUser(userId);
       if (!user) {
+        if (process.env.NODE_ENV !== "production") {
+          return res.status(200).json(null);
+        }
         return res.status(404).json({ message: "User not found" });
       }
       const { password, ...userData } = user;
@@ -145,6 +159,15 @@ function registerRoutes(app, httpServer) {
       console.error("Error fetching current user:", error);
       res.status(500).json({ message: "Error fetching user" });
     }
+  });
+  app.get("/privacy", (_req, res) => {
+    return res.redirect(302, "/privacy.html");
+  });
+  app.get("/terms", (_req, res) => {
+    return res.redirect(302, "/terms.html");
+  });
+  app.get("/community-guidelines", (_req, res) => {
+    return res.redirect(302, "/community-guidelines.html");
   });
   if (FEATURES.AUTH) {
     app.use("/api/user", userRoutes);

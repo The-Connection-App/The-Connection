@@ -44,7 +44,7 @@ router.put("/settings", async (req, res) => {
       return res.status(401).json({ message: 'Not authenticated' });
     }
     
-    const { displayName, email, bio, city, state, zipCode } = req.body;
+  const { displayName, email, bio, city, state, zipCode, notifyDMs, notifyCommunities, notifyForums, notifyFeed } = req.body;
     
     // Only allow updating specific fields
     const updateData: any = {};
@@ -57,6 +57,15 @@ router.put("/settings", async (req, res) => {
     
   const resolvedUserId2 = typeof userId === 'number' ? userId : parseInt(String(userId));
   await storage.updateUser(resolvedUserId2, updateData);
+    // Update notification preferences if provided
+    const notifPrefs: any = {};
+    if (notifyDMs !== undefined) notifPrefs.notifyDMs = notifyDMs;
+    if (notifyCommunities !== undefined) notifPrefs.notifyCommunities = notifyCommunities;
+    if (notifyForums !== undefined) notifPrefs.notifyForums = notifyForums;
+    if (notifyFeed !== undefined) notifPrefs.notifyFeed = notifyFeed;
+    if (Object.keys(notifPrefs).length > 0) {
+      await storage.updateNotificationPreferences(resolvedUserId2, notifPrefs);
+    }
     res.json({ success: true });
   } catch (error) {
     console.error('Error updating user settings:', error);

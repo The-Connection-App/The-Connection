@@ -120,7 +120,7 @@ export function ReportContentModal({
             )}
 
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
+              <label className="text-sm font-medium text-muted-foreground mb-2 block">
                 Reason for reporting *
               </label>
               <Select value={reason} onValueChange={setReason}>
@@ -138,7 +138,7 @@ export function ReportContentModal({
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
+              <label className="text-sm font-medium text-muted-foreground mb-2 block">
                 Additional details (optional)
               </label>
               <Textarea

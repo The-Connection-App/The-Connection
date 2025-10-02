@@ -148,7 +148,7 @@ export default function HomePage({ isGuest = false }: HomePageProps) {
                 <Link href="/submit-post">
                   <Button className="w-full" size="sm">
                     <Plus className="h-4 w-4 mr-2" />
-                    Share Something
+                    Spark Something
                   </Button>
                 </Link>
               </CardContent>

@@ -5,6 +5,7 @@ import { initGA } from "./lib/analytics";
 import { ThemeProvider } from "./contexts/theme-context";
 import App from "./App";
 import "./index.css";
+import "./styles/force-input-foreground.css";
 
 // Dev helper: force dark mode in development so palette changes are visible immediately
 if (process.env.NODE_ENV !== 'production') {

@@ -23,9 +23,18 @@ const users = pgTable("users", {
   latitude: text("latitude"),
   longitude: text("longitude"),
   onboardingCompleted: boolean("onboarding_completed").default(false),
+  // Notification preferences (defaults to true)
+  notifyDMs: boolean("notify_dms").default(true),
+  notifyCommunities: boolean("notify_communities").default(true),
+  notifyForums: boolean("notify_forums").default(true),
+  notifyFeed: boolean("notify_feed").default(true),
+  // DM privacy: who can DM this user
+  dmPrivacy: text("dm_privacy").default("everyone"),
+  // "everyone", "connections", "nobody"
   isVerifiedApologeticsAnswerer: boolean("is_verified_apologetics_answerer").default(false),
   isAdmin: boolean("is_admin").default(false),
   createdAt: timestamp("created_at").defaultNow(),
+  deletedAt: timestamp("deleted_at"),
   updatedAt: timestamp("updated_at").defaultNow()
 });
 const insertUserSchema = createInsertSchema(users).omit({
@@ -33,6 +42,31 @@ const insertUserSchema = createInsertSchema(users).omit({
   isVerifiedApologeticsAnswerer: true,
   createdAt: true,
   updatedAt: true
+});
+const connections = pgTable("connections", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  connectedUserId: integer("connected_user_id").references(() => users.id).notNull(),
+  status: text("status").notNull().default("pending"),
+  // "pending", "accepted", "blocked"
+  createdAt: timestamp("created_at").defaultNow()
+});
+const insertConnectionSchema = createInsertSchema(connections).omit({
+  id: true,
+  createdAt: true
+});
+const pushTokens = pgTable("push_tokens", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  token: text("token").notNull().unique(),
+  platform: text("platform").notNull(),
+  // "ios", "android", "web"
+  createdAt: timestamp("created_at").defaultNow(),
+  lastUsed: timestamp("last_used").defaultNow()
+});
+const insertPushTokenSchema = createInsertSchema(pushTokens).omit({
+  id: true,
+  createdAt: true
 });
 const organizations = pgTable("organizations", {
   id: serial("id").primaryKey(),
@@ -115,6 +149,7 @@ const communities = pgTable("communities", {
   hasPrivateWall: boolean("has_private_wall").default(false),
   hasPublicWall: boolean("has_public_wall").default(true),
   createdAt: timestamp("created_at").defaultNow(),
+  deletedAt: timestamp("deleted_at"),
   createdBy: integer("created_by").references(() => users.id)
 });
 const insertCommunityObjectSchema = createInsertSchema(communities).omit({
@@ -236,7 +271,8 @@ const communityWallPosts = pgTable("community_wall_posts", {
   // For private wall posts
   likeCount: integer("like_count").default(0),
   commentCount: integer("comment_count").default(0),
-  createdAt: timestamp("created_at").defaultNow()
+  createdAt: timestamp("created_at").defaultNow(),
+  deletedAt: timestamp("deleted_at")
 });
 const insertCommunityWallPostSchema = createInsertSchema(communityWallPosts).pick({
   communityId: true,
@@ -610,7 +646,8 @@ const events = pgTable("events", {
   communityId: integer("community_id").references(() => communities.id),
   groupId: integer("group_id").references(() => groups.id),
   creatorId: integer("creator_id").notNull().references(() => users.id),
-  createdAt: timestamp("created_at").defaultNow()
+  createdAt: timestamp("created_at").defaultNow(),
+  deletedAt: timestamp("deleted_at")
 });
 const insertEventSchema = createInsertSchema(events).pick({
   title: true,
@@ -1099,6 +1136,7 @@ export {
   communityInvitations,
   communityMembers,
   communityWallPosts,
+  connections,
   contentRecommendations,
   contentReports,
   creatorTiers,
@@ -1126,6 +1164,7 @@ export {
   insertCommunityObjectSchema,
   insertCommunitySchema,
   insertCommunityWallPostSchema,
+  insertConnectionSchema,
   insertContentRecommendationSchema,
   insertContentReportSchema,
   insertCreatorTierSchema,
@@ -1149,6 +1188,7 @@ export {
   insertPostSchema,
   insertPrayerRequestSchema,
   insertPrayerSchema,
+  insertPushTokenSchema,
   insertResourceCollectionSchema,
   insertResourceRatingSchema,
   insertResourceSchema,
@@ -1179,6 +1219,7 @@ export {
   posts,
   prayerRequests,
   prayers,
+  pushTokens,
   resourceCollections,
   resourceRatings,
   resources,

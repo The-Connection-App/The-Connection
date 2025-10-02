@@ -116,7 +116,7 @@ export default function ChurchSignupPage() {
             <CardTitle className="text-2xl font-bold text-gray-900">
               Create Your Church Account
             </CardTitle>
-            <CardDescription className="text-gray-600 mt-2">
+            <CardDescription className="text-muted-foreground mt-2">
               Connect your church community with powerful digital tools for growth and engagement
             </CardDescription>
           </CardHeader>

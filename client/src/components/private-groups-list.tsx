@@ -91,7 +91,7 @@ export default function PrivateGroupsList() {
     return (
       <Card>
         <CardHeader className="px-4 py-3 bg-neutral-50 border-b border-neutral-200">
-          <CardTitle className="font-semibold text-neutral-800">Private Groups</CardTitle>
+          <CardTitle className="font-semibold text-card-foreground">Private Groups</CardTitle>
         </CardHeader>
         <CardContent className="p-4 text-center">
           <p className="text-sm text-neutral-600 mb-3">Sign in to see your private groups</p>
@@ -107,7 +107,7 @@ export default function PrivateGroupsList() {
     return (
       <Card>
         <CardHeader className="px-4 py-3 bg-neutral-50 border-b border-neutral-200">
-          <CardTitle className="font-semibold text-neutral-800">Your Private Groups</CardTitle>
+          <CardTitle className="font-semibold text-card-foreground">Your Private Groups</CardTitle>
         </CardHeader>
         <CardContent className="p-2">
           {[1, 2, 3].map((i) => (
@@ -127,7 +127,7 @@ export default function PrivateGroupsList() {
   return (
     <Card>
       <CardHeader className="px-4 py-3 bg-neutral-50 border-b border-neutral-200">
-        <CardTitle className="font-semibold text-neutral-800">Your Private Groups</CardTitle>
+        <CardTitle className="font-semibold text-card-foreground">Your Private Groups</CardTitle>
       </CardHeader>
       <CardContent className="p-2">
         {groups && groups.length > 0 ? (

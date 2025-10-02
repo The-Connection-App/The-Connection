@@ -201,7 +201,7 @@ export default function AdminLivestreamerApplications() {
                     </div>
                   </CardHeader>
                   <CardContent className="pb-3">
-                    <p className="line-clamp-3 text-sm text-gray-600">{application.content}</p>
+                    <p className="line-clamp-3 text-sm text-muted-foreground">{application.content}</p>
                     <div className="mt-3 text-xs text-gray-400">
                       Applied {new Date(application.createdAt).toLocaleDateString()}
                     </div>
@@ -267,10 +267,10 @@ export default function AdminLivestreamerApplications() {
                     </div>
                   </CardHeader>
                   <CardContent className="pb-3">
-                    <p className="line-clamp-3 text-sm text-gray-600">{application.content}</p>
+                    <p className="line-clamp-3 text-sm text-muted-foreground">{application.content}</p>
                     {application.reviewNotes && (
                       <div className="mt-2 rounded bg-gray-50 p-2 text-sm">
-                        <p className="font-semibold text-gray-600">Review Notes:</p>
+                        <p className="font-semibold text-muted-foreground">Review Notes:</p>
                         <p className="text-gray-500">{application.reviewNotes}</p>
                       </div>
                     )}

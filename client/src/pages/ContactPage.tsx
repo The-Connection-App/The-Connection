@@ -12,7 +12,7 @@ export default function ContactPage() {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Contact Us</h1>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           Get in touch with our team for support, feedback, or questions about The Connection.
         </p>
       </div>
@@ -27,7 +27,7 @@ export default function ContactPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               For general questions, technical support, or feedback about the platform.
             </p>
             <div className="space-y-2">
@@ -41,7 +41,7 @@ export default function ContactPage() {
               <div className="flex items-center gap-2 text-sm">
                 <Clock className="h-4 w-4 text-gray-500" />
                 <span className="font-medium">Response time:</span>
-                <span className="text-gray-600">Within 24 hours</span>
+                <span className="text-muted-foreground">Within 24 hours</span>
               </div>
             </div>
             <Button asChild>
@@ -61,7 +61,7 @@ export default function ContactPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Report inappropriate content, harassment, or safety concerns.
             </p>
             <div className="space-y-2">
@@ -75,7 +75,7 @@ export default function ContactPage() {
               <div className="flex items-center gap-2 text-sm">
                 <Clock className="h-4 w-4 text-gray-500" />
                 <span className="font-medium">Response time:</span>
-                <span className="text-gray-600">Within 24 hours</span>
+                <span className="text-muted-foreground">Within 24 hours</span>
               </div>
             </div>
             <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
@@ -101,7 +101,7 @@ export default function ContactPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Partnerships, ministry collaborations, or business opportunities.
             </p>
             <div className="space-y-2">
@@ -115,7 +115,7 @@ export default function ContactPage() {
               <div className="flex items-center gap-2 text-sm">
                 <Clock className="h-4 w-4 text-gray-500" />
                 <span className="font-medium">Response time:</span>
-                <span className="text-gray-600">Within 48 hours</span>
+                <span className="text-muted-foreground">Within 48 hours</span>
               </div>
             </div>
             <Button asChild variant="outline">
@@ -135,7 +135,7 @@ export default function ContactPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               App bugs, login problems, or technical difficulties.
             </p>
             <div className="space-y-2">
@@ -149,7 +149,7 @@ export default function ContactPage() {
               <div className="flex items-center gap-2 text-sm">
                 <Clock className="h-4 w-4 text-gray-500" />
                 <span className="font-medium">Response time:</span>
-                <span className="text-gray-600">Within 12 hours</span>
+                <span className="text-muted-foreground">Within 12 hours</span>
               </div>
             </div>
             <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
@@ -174,7 +174,7 @@ export default function ContactPage() {
             <CardTitle>Mailing Address</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-1 text-gray-600">
+            <div className="space-y-1 text-muted-foreground">
               <p>The Connection</p>
               <p>1234 Faith Avenue</p>
               <p>Suite 567</p>
@@ -189,7 +189,7 @@ export default function ContactPage() {
             <CardTitle>Community Guidelines & Safety</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               We are committed to maintaining a safe, respectful, and Christ-centered community. 
               Our moderation team reviews all reports within 24 hours and takes appropriate action 
               to ensure community standards are upheld.

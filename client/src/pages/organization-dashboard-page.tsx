@@ -96,7 +96,7 @@ export default function OrganizationDashboardPage() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading organization...</p>
+            <p className="mt-4 text-muted-foreground">Loading organization...</p>
           </div>
         </div>
       </div>
@@ -118,7 +118,7 @@ export default function OrganizationDashboardPage() {
     switch (plan) {
       case "premium": return "bg-purple-100 text-purple-800 border-purple-300";
       case "standard": return "bg-blue-100 text-blue-800 border-blue-300";
-      default: return "bg-gray-100 text-gray-800 border-gray-300";
+      default: return "bg-gray-100 text-card-foreground border-gray-300";
     }
   };
 
@@ -138,7 +138,7 @@ export default function OrganizationDashboardPage() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{organization.name}</h1>
               {organization.description && (
-                <p className="text-gray-600 mt-1">{organization.description}</p>
+                <p className="text-muted-foreground mt-1">{organization.description}</p>
               )}
               <div className="flex items-center gap-2 mt-2">
                 <Badge className={getPlanBadgeColor(organization.plan)}>
@@ -164,7 +164,7 @@ export default function OrganizationDashboardPage() {
             <div className="flex items-center gap-3">
               <Users className="w-8 h-8 text-blue-600" />
               <div>
-                <p className="text-sm text-gray-600">Total Members</p>
+                <p className="text-sm text-muted-foreground">Total Members</p>
                 <p className="text-2xl font-bold">{members.length}</p>
               </div>
             </div>
@@ -176,7 +176,7 @@ export default function OrganizationDashboardPage() {
             <div className="flex items-center gap-3">
               <Crown className="w-8 h-8 text-purple-600" />
               <div>
-                <p className="text-sm text-gray-600">Administrators</p>
+                <p className="text-sm text-muted-foreground">Administrators</p>
                 <p className="text-2xl font-bold">
                   {members.filter(m => m.membership.role === 'admin').length}
                 </p>
@@ -190,7 +190,7 @@ export default function OrganizationDashboardPage() {
             <div className="flex items-center gap-3">
               <Calendar className="w-8 h-8 text-green-600" />
               <div>
-                <p className="text-sm text-gray-600">This Month's Events</p>
+                <p className="text-sm text-muted-foreground">This Month's Events</p>
                 <p className="text-2xl font-bold">0</p>
               </div>
             </div>
@@ -202,7 +202,7 @@ export default function OrganizationDashboardPage() {
             <div className="flex items-center gap-3">
               <MessageSquare className="w-8 h-8 text-orange-600" />
               <div>
-                <p className="text-sm text-gray-600">Active Discussions</p>
+                <p className="text-sm text-muted-foreground">Active Discussions</p>
                 <p className="text-2xl font-bold">0</p>
               </div>
             </div>
@@ -355,7 +355,7 @@ export default function OrganizationDashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="text-xl font-semibold capitalize">{organization.plan} Plan</h4>
-                  <p className="text-gray-600">
+                  <p className="text-muted-foreground">
                     {organization.plan === 'free' && 'Free forever with basic features'}
                     {organization.plan === 'standard' && '$29/month - Enhanced features and support'}
                     {organization.plan === 'premium' && '$59/month - All features plus advanced analytics'}

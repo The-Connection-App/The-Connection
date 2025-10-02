@@ -361,7 +361,7 @@ export default function NearMe() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pb-2">
-                    <p className="text-sm text-gray-700 line-clamp-2">{community.description}</p>
+                    <p className="text-sm text-muted-foreground line-clamp-2">{community.description}</p>
                     
                     {community.interestTags && community.interestTags.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
@@ -423,7 +423,7 @@ export default function NearMe() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pb-2">
-                    <p className="text-sm text-gray-700 line-clamp-2">{event.description}</p>
+                    <p className="text-sm text-muted-foreground line-clamp-2">{event.description}</p>
                     
                     <div className="flex items-center gap-1 mt-2 text-sm text-muted-foreground">
                       <Clock className="h-3 w-3" />

@@ -222,7 +222,7 @@ export default function MobileMicroblogComposer({
                 )}
               </Avatar>
               <span className="text-muted-foreground text-sm flex-1">
-                {parentId ? "Write your reply..." : "What's on your mind?"}
+                {parentId ? "Write your reply..." : "Spark up some conversation..."}
               </span>
               <Camera className="h-5 w-5 text-primary/70" />
             </div>
@@ -232,7 +232,7 @@ export default function MobileMicroblogComposer({
             <SheetHeader className="text-left">
               <SheetTitle>{parentId ? "Reply to post" : "Create a post"}</SheetTitle>
               <SheetDescription>
-                Share your thoughts with the community
+                Spark up some conversation with the community
               </SheetDescription>
             </SheetHeader>
             
@@ -252,7 +252,7 @@ export default function MobileMicroblogComposer({
               </div>
               
               <Textarea
-                placeholder={parentId ? "Write your reply..." : "What's on your mind?"}
+                placeholder={parentId ? "Write your reply..." : "Spark up some conversation..."}
                 className="flex-1 min-h-[150px] border-none resize-none focus-visible:ring-0 focus-visible:ring-offset-0 text-base p-0"
                 value={content}
                 onChange={handleContentChange}
@@ -343,8 +343,8 @@ export default function MobileMicroblogComposer({
         </Avatar>
         
         <div className="flex-1">
-          <Textarea
-            placeholder={parentId ? "Write your reply..." : "What's on your mind?"}
+            <Textarea
+            placeholder={parentId ? "Write your reply..." : "Spark up some conversation..."}
             className="border-none resize-none focus-visible:ring-0 focus-visible:ring-offset-0 text-base p-0 min-h-[100px]"
             value={content}
             onChange={handleContentChange}
