@@ -1,5 +1,5 @@
 import express from "express";
-import { storage } from "../storage.js";
+import { storage } from "../storage-optimized.js";
 const router = express.Router();
 router.get("/:userId", async (req, res) => {
   if (!req.session?.userId) {
@@ -28,6 +28,11 @@ router.post("/send", async (req, res) => {
       receiverId: parseInt(receiverId),
       content
     });
+    try {
+      console.log("Push notification would be sent here once push_tokens table is created");
+    } catch (pushError) {
+      console.error("Error sending push notification:", pushError);
+    }
     res.json(message);
   } catch (error) {
     console.error("Error sending direct message:", error);

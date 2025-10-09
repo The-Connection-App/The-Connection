@@ -69,6 +69,7 @@ import adminRoutes from './routes/api/admin';
 import userRoutes from './routes/api/user';
 import userSettingsRoutes from './routes/userSettingsRoutes';
 import dmRoutes from './routes/dmRoutes';
+import pushTokenRoutes from './routes/pushTokens';
 import organizationRoutes from './routes/organizations';
 import mvpRoutes from './routes/mvp';
 import { recommendationRouter } from './routes/recommendation';
@@ -97,7 +98,7 @@ declare module 'express-session' {
   }
 }
 
-export function registerRoutes(app: Express, httpServer: HTTPServer) {
+export async function registerRoutes(app: Express, httpServer: HTTPServer) {
   // Set up authentication
   setupAuth(app);
 
@@ -201,8 +202,10 @@ export function registerRoutes(app: Express, httpServer: HTTPServer) {
     app.use('/api', authRoutes);
     app.use('/api', accountRoutes);
     // safety routes (reports, blocks) kept for backwards compatibility
-    const safetyRoutes = require('./routes/safety').default;
-    app.use('/api', safetyRoutes);
+  // dynamic import because this file is loaded as ESM where `require` is not defined
+  const safetyModule = await import('./routes/safety');
+  const safetyRoutes = safetyModule.default;
+  app.use('/api', safetyRoutes);
     // compatibility moderation router (client expects /api/moderation/*)
     app.use('/api', moderationRoutes);
   }
@@ -274,6 +277,8 @@ export function registerRoutes(app: Express, httpServer: HTTPServer) {
   if (FEATURES.AUTH) {
     app.use('/api/user', userRoutes);
     app.use('/api/user', userSettingsRoutes);
+    app.use('/api/dms', dmRoutes);
+    app.use('/api/push-tokens', pushTokenRoutes);
   }
 
 

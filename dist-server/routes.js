@@ -1,6 +1,7 @@
+import { getUserId } from "./utils/session.js";
 import { Server as SocketIOServer } from "socket.io";
 import { setupAuth, isAuthenticated, isAdmin } from "./auth.js";
-import { storage as storageReal } from "./storage.js";
+import { storage as storageReal } from "./storage-optimized.js";
 const storage = storageReal;
 import { insertCommunitySchema, insertPostSchema, insertCommentSchema, insertMicroblogSchema, insertPrayerRequestSchema, insertEventSchema, insertLivestreamerApplicationSchema, insertApologistScholarApplicationSchema } from "./shared/schema.js";
 import { BASE_URL, EMAIL_FROM } from "./config/domain.js";
@@ -13,6 +14,8 @@ const generateToken = () => crypto.randomBytes(32).toString("hex");
 import adminRoutes from "./routes/api/admin.js";
 import userRoutes from "./routes/api/user.js";
 import userSettingsRoutes from "./routes/userSettingsRoutes.js";
+import dmRoutes from "./routes/dmRoutes.js";
+import pushTokenRoutes from "./routes/pushTokens.js";
 import mvpRoutes from "./routes/mvp.js";
 import supportRoutes from "./routes/api/support.js";
 import accountRoutes from "./routes/account.js";
@@ -23,6 +26,8 @@ import postsRoutes from "./routes/posts.js";
 import communitiesRoutes from "./routes/communities.js";
 import eventsRoutes from "./routes/events.js";
 import apologeticsRoutes from "./routes/apologetics.js";
+import moderationRoutes from "./routes/moderation.js";
+import safetyRoutes from "./routes/safety.js";
 function registerRoutes(app, httpServer) {
   setupAuth(app);
   app.use((req, _res, next) => {
@@ -94,8 +99,8 @@ function registerRoutes(app, httpServer) {
   if (FEATURES.AUTH) {
     app.use("/api", authRoutes);
     app.use("/api", accountRoutes);
-    const safetyRoutes = require("./routes/safety").default;
     app.use("/api", safetyRoutes);
+    app.use("/api", moderationRoutes);
   }
   if (FEATURES.ORGS) {
     app.use("/api/admin", adminRoutes);
@@ -149,6 +154,8 @@ function registerRoutes(app, httpServer) {
   if (FEATURES.AUTH) {
     app.use("/api/user", userRoutes);
     app.use("/api/user", userSettingsRoutes);
+    app.use("/api/dms", dmRoutes);
+    app.use("/api/push-tokens", pushTokenRoutes);
   }
   if (FEATURES.AUTH) {
     app.get("/api/users", async (req, res) => {
@@ -1081,7 +1088,7 @@ function registerRoutes(app, httpServer) {
   });
   app.post("/api/applications/apologist-scholar", isAuthenticated, async (req, res) => {
     try {
-      const userId = getSessionUserId(req);
+      const userId = getUserId(req.session.userId);
       const validatedData = insertApologistScholarApplicationSchema.parse({
         ...req.body,
         userId
@@ -1250,7 +1257,7 @@ function registerRoutes(app, httpServer) {
   });
   app.post("/api/recommendations/interaction", isAuthenticated, async (req, res) => {
     try {
-      const userId = getSessionUserId(req);
+      const userId = getUserId(req.session.userId);
       const { contentId, contentType, interactionType } = req.body;
       console.log(`Interaction recorded: User ${userId} -> ${interactionType} on ${contentType} ${contentId}`);
       res.json({ success: true });
@@ -1261,7 +1268,7 @@ function registerRoutes(app, httpServer) {
   });
   app.get("/api/recommendations/feed", isAuthenticated, async (req, res) => {
     try {
-      const userId = getSessionUserId(req);
+      const userId = getUserId(req.session.userId);
       const limit = parseInt(req.query.limit) || 20;
       const feed = await storage.getAllMicroblogs();
       res.json(feed.slice(0, limit));
@@ -1272,7 +1279,7 @@ function registerRoutes(app, httpServer) {
   });
   app.get("/api/recommendations/friends-activity", isAuthenticated, async (req, res) => {
     try {
-      const userId = getSessionUserId(req);
+      const userId = getUserId(req.session.userId);
       const activity = [];
       res.json(activity);
     } catch (error) {
