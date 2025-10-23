@@ -202,7 +202,7 @@ async function sendTemplatedEmail(params) {
       TemplateData: JSON.stringify(templateData)
     });
     const response = await sesClient.send(sendTemplatedEmailCommand);
-    console.log(`Templated email sent successfully to ${to}`, response.MessageId);
+    console.log("Templated email sent successfully to %s", to, response.MessageId);
     return true;
   } catch (error) {
     console.error("Error sending templated email:", error);
