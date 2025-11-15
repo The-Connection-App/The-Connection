@@ -30,6 +30,9 @@ interface UseChatWebsocketReturn {
   error: string | null;
 }
 
+// PERFORMANCE FIX: Add message buffer limit to prevent memory leaks
+const MAX_MESSAGE_BUFFER = 500; // Keep only the most recent 500 messages in memory
+
 export function useChatWebsocket(): UseChatWebsocketReturn {
   const { user } = useAuth();
   const [socket, setSocket] = useState<WebSocket | null>(null);
@@ -38,13 +41,13 @@ export function useChatWebsocket(): UseChatWebsocketReturn {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [usersTyping, setUsersTyping] = useState<{ userId: number; username: string; roomId: number }[]>([]);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Keep track of subscribed rooms
   const subscribedRoomsRef = useRef<Set<number>>(new Set());
-  
+
   // Message handlers map
   const messageHandlersRef = useRef<Map<string, MessageHandler>>(new Map());
-  
+
   // Keep track of typing timeouts to prevent memory leaks
   const typingTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
   
@@ -83,13 +86,28 @@ export function useChatWebsocket(): UseChatWebsocketReturn {
         // Filter out messages that are already in the history for this room
         const existingIds = new Set(prevMessages.map(m => m.id));
         const newMessages = data.messages.filter((m: ChatMessage) => !existingIds.has(m.id));
-        return [...prevMessages, ...newMessages];
+        const combined = [...prevMessages, ...newMessages];
+
+        // PERFORMANCE FIX: Limit message buffer size to prevent memory leaks
+        // Keep only the most recent MAX_MESSAGE_BUFFER messages
+        if (combined.length > MAX_MESSAGE_BUFFER) {
+          return combined.slice(-MAX_MESSAGE_BUFFER);
+        }
+        return combined;
       });
     });
-    
+
     // Handle new messages
     messageHandlersRef.current.set("new_message", (data) => {
-      setMessages(prevMessages => [...prevMessages, data.message]);
+      setMessages(prevMessages => {
+        const updated = [...prevMessages, data.message];
+
+        // PERFORMANCE FIX: Limit message buffer size
+        if (updated.length > MAX_MESSAGE_BUFFER) {
+          return updated.slice(-MAX_MESSAGE_BUFFER);
+        }
+        return updated;
+      });
     });
     
     // Handle system messages
@@ -109,8 +127,16 @@ export function useChatWebsocket(): UseChatWebsocketReturn {
           avatarUrl: null
         }
       };
-      
-      setMessages(prevMessages => [...prevMessages, systemMessage]);
+
+      setMessages(prevMessages => {
+        const updated = [...prevMessages, systemMessage];
+
+        // PERFORMANCE FIX: Limit message buffer size
+        if (updated.length > MAX_MESSAGE_BUFFER) {
+          return updated.slice(-MAX_MESSAGE_BUFFER);
+        }
+        return updated;
+      });
     });
     
     // Handle user typing

@@ -104,13 +104,16 @@ export function useAuth(): AuthContextType {
       
       // First set the query data immediately
       queryClient.setQueryData(["/api/user"], user);
-      
-      // Then invalidate to force a fresh fetch and refetch immediately
-      await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/user"] });
-      
-      // Also invalidate other queries that depend on authentication
-      queryClient.invalidateQueries();
+
+      // PERFORMANCE FIX: Selectively invalidate only user-dependent queries
+      // instead of invalidating everything
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["/api/user"] }),
+        queryClient.invalidateQueries({ queryKey: ["/api/feed"] }),
+        queryClient.invalidateQueries({ queryKey: ["/api/communities"] }),
+        queryClient.invalidateQueries({ queryKey: ["/api/events"] }),
+        queryClient.invalidateQueries({ queryKey: ["/api/notifications"] }),
+      ]);
       
       toast({
         title: "Welcome back!",
@@ -188,9 +191,10 @@ export function useAuth(): AuthContextType {
     onSuccess: () => {
       // Clear user data from cache
       queryClient.setQueryData(["/api/user"], null);
-      
-      // Invalidate all queries to ensure fresh data on login
-      queryClient.invalidateQueries();
+
+      // PERFORMANCE FIX: Clear all cached data on logout (safe since user is leaving)
+      // This is one of the few cases where invalidating everything is appropriate
+      queryClient.clear();
       
       toast({
         title: "Logged out",

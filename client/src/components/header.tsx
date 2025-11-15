@@ -118,8 +118,9 @@ export default function Header() {
                 size="icon"
                 onClick={() => setSearchVisible(true)}
                 className="text-muted-foreground hover:text-foreground active-scale touch-target"
+                aria-label="Open search"
               >
-                <Search className="h-5 w-5" />
+                <Search className="h-5 w-5" aria-hidden="true" />
               </Button>
             </div>
 
@@ -133,10 +134,11 @@ export default function Header() {
                     variant="ghost"
                     size="icon"
                     className="text-muted-foreground hover:text-foreground hover:bg-background/60 relative active-scale touch-target"
+                    aria-label="Direct messages (unread messages)"
                   >
-                    <MessageSquare className="h-5 w-5" />
+                    <MessageSquare className="h-5 w-5" aria-hidden="true" />
                     {/* Unread messages indicator */}
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full"></span>
+                    <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full" aria-hidden="true"></span>
                   </Button>
                 </Link>
 
@@ -145,21 +147,23 @@ export default function Header() {
                   variant="ghost"
                   size="icon"
                   className="text-muted-foreground hover:text-foreground hover:bg-background/60 relative active-scale touch-target"
+                  aria-label="Notifications (unread notifications)"
                 >
-                  <BellIcon className="h-5 w-5" />
+                  <BellIcon className="h-5 w-5" aria-hidden="true" />
                   {/* Notification indicator dot - show when there are unread notifications */}
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true"></span>
                 </Button>
 
                 {/* Hamburger Menu Button - Available on all screen sizes */}
                 <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
                   <SheetTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       className="text-muted-foreground hover:text-foreground hover:bg-background/60"
+                      aria-label="Open navigation menu"
                     >
-                      <Menu className="h-5 w-5" />
+                      <Menu className="h-5 w-5" aria-hidden="true" />
                     </Button>
                   </SheetTrigger>
                   <SheetContent side="right" className="w-[85vw] sm:w-[350px] border-l border-border/60 p-0">

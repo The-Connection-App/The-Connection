@@ -24,10 +24,32 @@ export function makeCors() {
     allowlist.add(origin);
   }
 
+  // SECURITY FIX: In development, only allow localhost origins
+  const DEV_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+  ];
+
   return cors({
     origin: (origin, cb) => {
-      if (DEV) return cb(null, true);
+      // SECURITY: Development mode still enforces origin checking
+      if (DEV) {
+        // Allow undefined origin (same-origin requests, Postman, curl)
+        if (!origin) return cb(null, true);
 
+        // Check if origin is in development allowlist
+        if (DEV_ALLOWED_ORIGINS.includes(origin)) {
+          return cb(null, true);
+        }
+
+        // Deny other origins even in development
+        console.warn(`[CORS] Blocked origin in development: ${origin}`);
+        return cb(null, false);
+      }
+
+      // Production mode: check against allowlist and patterns
       if (origin && VERCEL_PATTERN.test(origin)) {
         return cb(null, true);
       }

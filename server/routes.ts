@@ -1672,15 +1672,56 @@ export async function registerRoutes(app: Express, httpServer: HTTPServer) {
   // Object storage endpoints
   app.post('/api/objects/upload', isAuthenticated, async (req, res) => {
     try {
-      const { fileName, fileType } = req.body;
-      
+      const { fileName, fileType, fileSize } = req.body;
+
+      // SECURITY FIX: Server-side file validation
+      const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB max
+      const ALLOWED_IMAGE_TYPES = [
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+      ];
+      const ALLOWED_DOCUMENT_TYPES = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      ];
+      const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_DOCUMENT_TYPES];
+
+      // Validate file type
+      if (!fileType || !ALLOWED_TYPES.includes(fileType)) {
+        return res.status(400).json({
+          message: `Invalid file type. Allowed types: images (JPEG, PNG, GIF, WebP) and documents (PDF, DOC, DOCX)`,
+        });
+      }
+
+      // Validate file size (if provided by client)
+      if (fileSize && fileSize > MAX_FILE_SIZE) {
+        return res.status(413).json({
+          message: `File size exceeds maximum allowed size of ${MAX_FILE_SIZE / 1024 / 1024}MB`,
+        });
+      }
+
+      // Validate file name
+      if (!fileName || fileName.length > 255) {
+        return res.status(400).json({
+          message: 'Invalid file name',
+        });
+      }
+
+      // Sanitize filename to prevent path traversal
+      const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
+
       // Generate upload parameters (would implement actual cloud storage integration)
       const uploadParams = {
-        url: `/api/objects/upload/${fileName}`,
+        url: `/api/objects/upload/${sanitizedFileName}`,
         fields: {
-          key: fileName,
-          'Content-Type': fileType
-        }
+          key: sanitizedFileName,
+          'Content-Type': fileType,
+        },
+        maxFileSize: MAX_FILE_SIZE,
       };
 
       res.json(uploadParams);

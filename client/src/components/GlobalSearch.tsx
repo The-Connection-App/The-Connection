@@ -205,13 +205,24 @@ export default function GlobalSearch({ isVisible, onClose, placeholder = "Search
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center pt-16">
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center pt-16"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Global search"
+      onClick={(e) => {
+        // Close when clicking the backdrop
+        if (e.target === e.currentTarget) {
+          handleClose();
+        }
+      }}
+    >
       <div className="w-full max-w-2xl mx-4">
         <Card className="shadow-2xl">
           <CardContent className="p-4">
             {/* Search Input */}
             <div className="relative mb-4">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
               <Input
                 ref={searchInputRef}
                 value={query}
@@ -221,22 +232,25 @@ export default function GlobalSearch({ isVisible, onClose, placeholder = "Search
                 }}
                 placeholder={placeholder}
                 className="pl-10 pr-10 h-12 text-base"
+                aria-label="Search communities, posts, people, and more"
+                aria-describedby={isLoading ? "search-loading" : undefined}
               />
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleClose}
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                aria-label="Close search"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
 
             {/* Search Results */}
-            <div className="max-h-96 overflow-y-auto">
+            <div className="max-h-96 overflow-y-auto" role="region" aria-live="polite" aria-label="Search results">
               {isLoading && debouncedQuery && (
-                <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                <div className="flex items-center justify-center py-8" id="search-loading">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" role="status" aria-label="Loading search results"></div>
                 </div>
               )}
 

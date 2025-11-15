@@ -1,7 +1,9 @@
 import { Router } from 'express';
-import { insertCommunitySchema } from '@shared/schema';
+import { insertCommunitySchema, communities, userBlocks } from '@shared/schema';
 import { isAuthenticated } from '../auth';
 import { storage } from '../storage-optimized';
+import { db } from '../db';
+import { desc, not, inArray, eq, or, ilike, and, isNull } from 'drizzle-orm';
 
 const router = Router();
 
@@ -13,20 +15,73 @@ function getSessionUserId(req: any): number | undefined {
   return Number.isFinite(n) ? n : undefined;
 }
 
+// PERFORMANCE FIX: Use database-level filtering instead of loading all communities into memory
 router.get('/api/communities', async (req, res) => {
   try {
     const userId = getSessionUserId(req);
     const searchQuery = req.query.search as string;
-    let communities = await storage.getPublicCommunitiesAndUserCommunities(userId, searchQuery);
+    const limit = parseInt(req.query.limit as string) || 50;
+
+    // Try database-backed query first (more efficient)
+    if (db) {
+      try {
+        // Get blocked user IDs if user is logged in
+        let blockedIds: number[] = [];
+        if (userId) {
+          const blockedRows = await db
+            .select({ blockedId: userBlocks.blockedId })
+            .from(userBlocks)
+            .where(eq(userBlocks.blockerId, userId));
+          blockedIds = blockedRows.map(r => r.blockedId).filter((v): v is number => typeof v === 'number');
+        }
+
+        // Build where clauses
+        const whereClauses = [
+          isNull(communities.deletedAt), // Exclude deleted communities
+        ];
+
+        // Filter out blocked users' communities
+        if (blockedIds.length > 0) {
+          whereClauses.push(not(inArray(communities.createdBy, blockedIds)));
+        }
+
+        // Add search filter if provided
+        if (searchQuery) {
+          whereClauses.push(
+            or(
+              ilike(communities.name, `%${searchQuery}%`),
+              ilike(communities.description, `%${searchQuery}%`)
+            )
+          );
+        }
+
+        // Execute optimized query with pagination
+        const result = await db
+          .select()
+          .from(communities)
+          .where(and(...whereClauses))
+          .orderBy(desc(communities.createdAt))
+          .limit(limit);
+
+        return res.json(result);
+      } catch (dbErr) {
+        console.warn('Database query for communities failed, falling back to storage:', dbErr);
+      }
+    }
+
+    // Fallback to storage-based implementation
+    let communitiesList = await storage.getPublicCommunitiesAndUserCommunities(userId, searchQuery);
     if (userId) {
       const blockedIds = await storage.getBlockedUserIdsFor(userId);
       if (blockedIds && blockedIds.length > 0) {
-        communities = communities.filter((c: any) => !blockedIds.includes(c.createdBy));
+        communitiesList = communitiesList.filter((c: any) => !blockedIds.includes(c.createdBy));
       }
     }
-    // Recent 50 (assume createdAt desc order downstream or sort here)
-    communities = communities.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 50);
-    res.json(communities);
+    // Recent communities with limit
+    communitiesList = communitiesList
+      .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, limit);
+    res.json(communitiesList);
   } catch (error) {
     console.error('Error fetching communities:', error);
     res.status(500).json({ message: 'Error fetching communities' });

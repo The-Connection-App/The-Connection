@@ -1,7 +1,10 @@
 import { Router } from 'express';
-import { insertEventSchema } from '@shared/schema';
+import { insertEventSchema, events, userBlocks } from '@shared/schema';
 import { isAuthenticated } from '../auth';
 import { storage } from '../storage-optimized';
+import { db } from '../db';
+import { desc, not, inArray, eq, isNull, and, gte } from 'drizzle-orm';
+import { sql as sqlTag } from 'drizzle-orm';
 
 const router = Router();
 
@@ -13,18 +16,59 @@ function getSessionUserId(req: any): number | undefined {
   return Number.isFinite(n) ? n : undefined;
 }
 
+// PERFORMANCE FIX: Use database-level filtering instead of loading all events into memory
 router.get('/api/events', async (req, res) => {
   try {
     const filter = req.query.filter as string;
     const userId = getSessionUserId(req);
-    let events = await storage.getAllEvents();
+    const limit = parseInt(req.query.limit as string) || 100;
+
+    // Try database-backed query first (more efficient)
+    if (db) {
+      try {
+        // Get blocked user IDs if user is logged in
+        let blockedIds: number[] = [];
+        if (userId) {
+          const blockedRows = await db
+            .select({ blockedId: userBlocks.blockedId })
+            .from(userBlocks)
+            .where(eq(userBlocks.blockerId, userId));
+          blockedIds = blockedRows.map(r => r.blockedId).filter((v): v is number => typeof v === 'number');
+        }
+
+        // Build where clauses
+        const whereClauses = [
+          isNull(events.deletedAt), // Exclude deleted events
+        ];
+
+        // Filter out blocked users' events
+        if (blockedIds.length > 0) {
+          whereClauses.push(not(inArray(events.creatorId, blockedIds)));
+        }
+
+        // Execute optimized query
+        const result = await db
+          .select()
+          .from(events)
+          .where(and(...whereClauses))
+          .orderBy(desc(events.createdAt))
+          .limit(limit);
+
+        return res.json(result);
+      } catch (dbErr) {
+        console.warn('Database query for events failed, falling back to storage:', dbErr);
+      }
+    }
+
+    // Fallback to storage-based implementation
+    let eventsList = await storage.getAllEvents();
     if (userId) {
       const blockedIds = await storage.getBlockedUserIdsFor(userId);
       if (blockedIds && blockedIds.length > 0) {
-        events = events.filter((e: any) => !blockedIds.includes(e.creatorId));
+        eventsList = eventsList.filter((e: any) => !blockedIds.includes(e.creatorId));
       }
     }
-    res.json(events);
+    res.json(eventsList.slice(0, limit));
   } catch (error) {
     console.error('Error fetching events:', error);
     res.status(500).json({ message: 'Error fetching events' });
@@ -33,9 +77,33 @@ router.get('/api/events', async (req, res) => {
 
 router.get('/api/events/public', async (_req, res) => {
   try {
+    const limit = parseInt(_req.query.limit as string) || 100;
+
+    // Try database-backed query first
+    if (db) {
+      try {
+        const result = await db
+          .select()
+          .from(events)
+          .where(
+            and(
+              eq(events.isPublic, true),
+              isNull(events.deletedAt)
+            )
+          )
+          .orderBy(desc(events.createdAt))
+          .limit(limit);
+
+        return res.json(result);
+      } catch (dbErr) {
+        console.warn('Database query for public events failed, falling back to storage:', dbErr);
+      }
+    }
+
+    // Fallback
     const allEvents = await storage.getAllEvents();
-    const events = allEvents.filter((event: any) => event.isPublic);
-    res.json(events);
+    const publicEvents = allEvents.filter((event: any) => event.isPublic).slice(0, limit);
+    res.json(publicEvents);
   } catch (error) {
     console.error('Error fetching public events:', error);
     res.status(500).json({ message: 'Error fetching public events' });
@@ -44,9 +112,37 @@ router.get('/api/events/public', async (_req, res) => {
 
 router.get('/api/events/upcoming', async (_req, res) => {
   try {
+    const limit = parseInt(_req.query.limit as string) || 100;
     const now = new Date();
+    const todayStart = new Date(now.toDateString());
+
+    // Try database-backed query first
+    if (db) {
+      try {
+        const result = await db
+          .select()
+          .from(events)
+          .where(
+            and(
+              isNull(events.deletedAt),
+              gte(events.eventDate, todayStart)
+            )
+          )
+          .orderBy(events.eventDate) // Ascending for upcoming events
+          .limit(limit);
+
+        return res.json(result);
+      } catch (dbErr) {
+        console.warn('Database query for upcoming events failed, falling back to storage:', dbErr);
+      }
+    }
+
+    // Fallback
     const all = await storage.getAllEvents();
-    const upcoming = all.filter((e: any) => !e.deletedAt && new Date(e.eventDate) >= new Date(now.toDateString())).sort((a: any, b: any) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime());
+    const upcoming = all
+      .filter((e: any) => !e.deletedAt && new Date(e.eventDate) >= todayStart)
+      .sort((a: any, b: any) => new Date(a.eventDate).getTime() - new Date(b.eventDate).getTime())
+      .slice(0, limit);
     res.json(upcoming);
   } catch (error) {
     console.error('Error fetching upcoming events:', error);

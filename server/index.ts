@@ -25,10 +25,71 @@ async function bootstrap() {
   const httpServer = createServer(app);
   (app as any).listen = httpServer.listen.bind(httpServer);
 
-  if (isProduction && !process.env.SESSION_SECRET) {
-    console.error("FATAL ERROR: SESSION_SECRET environment variable is required in production");
-    console.error("Please set a strong, random SESSION_SECRET in your environment variables");
+  // SECURITY: Validate critical environment variables at startup
+  const requiredEnvVars = [
+    { name: 'SESSION_SECRET', condition: isProduction },
+    { name: 'DATABASE_URL', condition: process.env.USE_DB === 'true' },
+  ];
+
+  const optionalButRecommendedEnvVars = [
+    { name: 'AWS_ACCESS_KEY_ID', feature: 'Email functionality' },
+    { name: 'AWS_SECRET_ACCESS_KEY', feature: 'Email functionality' },
+    { name: 'AWS_REGION', feature: 'Email functionality' },
+    { name: 'GCS_BUCKET_NAME', feature: 'Google Cloud Storage' },
+    { name: 'GCS_PROJECT_ID', feature: 'Google Cloud Storage' },
+  ];
+
+  // Check required environment variables
+  const missingRequired = requiredEnvVars.filter(
+    ({ name, condition }) => condition && !process.env[name]
+  );
+
+  if (missingRequired.length > 0) {
+    console.error("FATAL ERROR: Missing required environment variables:");
+    missingRequired.forEach(({ name }) => {
+      console.error(`  - ${name}`);
+    });
+    console.error("\nPlease set these environment variables before starting the server.");
     process.exit(1);
+  }
+
+  // Warn about missing optional but recommended variables
+  const missingOptional = optionalButRecommendedEnvVars.filter(
+    ({ name }) => !process.env[name]
+  );
+
+  if (missingOptional.length > 0) {
+    console.warn("\n⚠️  WARNING: Missing optional environment variables:");
+    missingOptional.forEach(({ name, feature }) => {
+      console.warn(`  - ${name} (required for: ${feature})`);
+    });
+    console.warn("Some features may not work properly.\n");
+  }
+
+  // SECURITY: Validate SESSION_SECRET strength in production
+  if (isProduction && process.env.SESSION_SECRET) {
+    const sessionSecret = process.env.SESSION_SECRET;
+    if (sessionSecret.length < 32) {
+      console.error("FATAL ERROR: SESSION_SECRET must be at least 32 characters long in production");
+      console.error("Current length:", sessionSecret.length);
+      process.exit(1);
+    }
+    // Check if it looks like a default/weak secret
+    const weakSecrets = [
+      'secret',
+      'password',
+      'dev',
+      'test',
+      'theconnection',
+      '12345',
+      'changeme',
+    ];
+    const lowerSecret = sessionSecret.toLowerCase();
+    if (weakSecrets.some(weak => lowerSecret.includes(weak))) {
+      console.error("FATAL ERROR: SESSION_SECRET appears to be a weak or default secret");
+      console.error("Please use a strong, randomly generated secret (e.g., from `openssl rand -hex 32`)");
+      process.exit(1);
+    }
   }
 
   app.use(makeCors());
@@ -78,8 +139,21 @@ async function bootstrap() {
   const isSecureCookie = isProduction && process.env.COOKIE_SECURE !== "false";
   const sameSiteMode: "lax" | "none" = isSecureCookie ? "none" : "lax";
 
+  // SECURITY FIX: No fallback secret - require explicit configuration
+  const sessionSecret = process.env.SESSION_SECRET;
+  if (!sessionSecret) {
+    if (isProduction) {
+      // Should never reach here due to earlier validation, but double-check
+      throw new Error("SESSION_SECRET is required in production");
+    }
+    // In development, generate a random secret for this session only
+    console.warn("⚠️  WARNING: SESSION_SECRET not set. Using random secret for development.");
+    console.warn("⚠️  Sessions will not persist across server restarts.");
+    console.warn("⚠️  Set SESSION_SECRET in your .env file for persistent sessions.");
+  }
+
   const sessionOptions: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET ?? "theconnection-session-secret-dev-only",
+    secret: sessionSecret || require('crypto').randomBytes(32).toString('hex'),
     resave: false,
     saveUninitialized: false,
     name: "sessionId",
