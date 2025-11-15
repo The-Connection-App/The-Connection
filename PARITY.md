@@ -314,17 +314,41 @@ export default ({ config }) => ({
 
 ## 9) Parity Checklist Doc (to stop rot)
 
-Create `PARITY.md` in repo root and keep routes/features in sync. Example section:
+Keep routes/features in sync between web and mobile. Track implementation status:
 
-```
-[ ] /feed ↔ (tabs)/feed
-[ ] /communities ↔ (tabs)/communities
-[ ] /events ↔ (tabs)/events
-[ ] /apologetics ↔ (tabs)/apologetics
-[ ] /login ↔ /login
-[ ] /register ↔ /register
-[ ] /settings ↔ /settings
-```
+### Core Routes (Implemented)
+- [x] Web: /auth ↔ Mobile: (auth)/login + (auth)/register
+- [x] Web: /posts ↔ Mobile: (tabs)/feed
+- [x] Web: /communities ↔ Mobile: (tabs)/communities
+- [x] Web: /communities/:id ↔ Mobile: communities/[id]
+- [x] Web: /events ↔ Mobile: (tabs)/events
+- [x] Web: /events/:id ↔ Mobile: events/[id]
+- [x] Web: /apologetics ↔ Mobile: (tabs)/apologetics
+- [x] Web: /prayers ↔ Mobile: (tabs)/prayers
+- [x] Web: /prayers/:id ↔ Mobile: prayers/[id]
+- [x] Web: /profile ↔ Mobile: (tabs)/profile
+- [x] Web: /settings ↔ Mobile: /settings
+- [x] Web: /dms ↔ Mobile: (tabs)/messages
+- [x] Web: /dms/:userId ↔ Mobile: messages/[userId]
+
+### Additional Mobile Routes
+- [x] Mobile: (tabs)/create - Quick create menu
+- [x] Mobile: /menu - Navigation menu
+- [x] Mobile: /create-post - Post creation
+- [x] Mobile: /communities/create - Community creation
+- [x] Mobile: /events/create - Event creation
+- [x] Mobile: /profile/edit - Profile editing
+
+### Web-Only Routes (Consider Mobile Parity)
+- [ ] Web: /home - Landing/dashboard
+- [ ] Web: /discover - Discovery feed
+- [ ] Web: /forums - Forum discussions
+- [ ] Web: /groups - Groups feature
+- [ ] Web: /livestreams - Live streaming
+- [ ] Web: /microblogs - Microblogging feature
+- [ ] Web: /bible-study - Bible study resources
+- [ ] Web: /near-me - Location-based features
+- [ ] Web: /admin - Admin panel (web-only acceptable)
 
 ---
 

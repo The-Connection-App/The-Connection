@@ -3,6 +3,21 @@
     "version": ">= 16.26.0"
   },
   "build": {
+    "development": {
+      "node": "22.11.0",
+      "developmentClient": true,
+      "channel": "dev",
+      "env": {
+        "EXPO_PUBLIC_API_BASE": "https://dev.api.theconnection.app"
+      }
+    },
+    "preview": {
+      "node": "22.11.0",
+      "channel": "preview",
+      "env": {
+        "EXPO_PUBLIC_API_BASE": "https://staging.api.theconnection.app"
+      }
+    },
     "production": {
       "node": "22.11.0",
       "channel": "production",
@@ -12,11 +27,6 @@
       "ios": {
         "resourceClass": "m-medium"
       }
-    },
-    "preview": {
-      "node": "22.11.0",
-      "channel": "preview",
-      "developmentClient": true
     }
   },
   "submit": {
