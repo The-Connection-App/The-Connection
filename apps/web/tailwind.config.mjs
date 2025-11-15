@@ -1,6 +1,6 @@
-const { tokens } = require('../../shared/tokens');
+import { tokens } from '../../shared/tokens.ts';
 
-module.exports = {
+export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
